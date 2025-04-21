@@ -497,7 +497,7 @@ input:checked+.toggle-slider:before {
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 #b32062;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .settings-modal.childish .save-button:hover {

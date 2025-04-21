@@ -653,12 +653,12 @@
 
 .profile-modal.childish .user-details h3 {
   color: #92400e;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .profile-modal.childish .username {
   color: #92400e;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .profile-modal.childish .profile-btn {
@@ -666,7 +666,7 @@
   color: #92400e;
   border-radius: 1rem;
   box-shadow: 0 3px 0 rgba(251, 146, 60, 0.3);
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .profile-modal.childish .profile-btn:hover {
@@ -678,7 +678,7 @@
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 #bb2d2d;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .profile-modal.childish .logout-btn:hover {
@@ -745,7 +745,7 @@
 
 .profile-modal.childish .time-played {
   color: #92400e;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .profile-modal.childish .time-played strong {

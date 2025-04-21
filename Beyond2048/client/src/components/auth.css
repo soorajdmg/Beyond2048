@@ -330,7 +330,7 @@
   border-radius: 1rem;
   box-shadow: 0 8px 0 rgba(251, 146, 60, 0.2);
   border: 3px solid #fbbf24;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .childish-theme .auth-form h3 {

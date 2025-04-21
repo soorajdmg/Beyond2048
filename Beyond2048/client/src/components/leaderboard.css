@@ -576,7 +576,7 @@
   color: #92400e;
   border-radius: 1rem;
   box-shadow: 0 8px 0 rgba(251, 146, 60, 0.2);
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .modal-header {
@@ -587,7 +587,7 @@
 
 .leaderboard-modal.childish .modal-header h2 {
   color: #92400e;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .refresh-btn {
@@ -611,7 +611,7 @@
   color: #92400e;
   border-radius: 1rem;
   box-shadow: 0 3px 0 rgba(251, 146, 60, 0.3);
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .timeframe-btn:hover {
@@ -627,7 +627,7 @@
 .leaderboard-modal.childish .leaderboard-table thead th {
   color: #92400e;
   border-bottom: 2px solid #fde68a;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .leaderboard-table tbody td {
@@ -689,7 +689,7 @@
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 rgba(245, 158, 11, 0.5);
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .retry-btn:hover {
@@ -709,7 +709,7 @@
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 rgba(245, 158, 11, 0.5);
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .view-all-btn:hover {

@@ -152,12 +152,12 @@
 
 .childish-theme .overlay-title {
   color: #92400e; 
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .childish-theme .overlay-score {
   color: #b45309;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .childish-theme .overlay-button {
@@ -165,7 +165,7 @@
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 #be185d;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
   padding: 0.75rem 1.75rem;
 }
 

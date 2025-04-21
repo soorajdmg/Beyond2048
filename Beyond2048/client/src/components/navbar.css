@@ -263,12 +263,12 @@
 
 .childish-theme .info-section h3 {
   color: #92400e;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .childish-theme .info-list li {
   color: #b45309;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .childish-theme .info-list li strong {
@@ -300,7 +300,7 @@
 .childish-theme .game-credits {
   color: #92400e;
   border-top: 1px dashed #fbbf24;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 @media (min-width: 640px) {

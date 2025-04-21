@@ -204,7 +204,7 @@
   color: #92400e;
   box-shadow: 0 3px 0 rgba(251, 146, 60, 0.4);
   border: 2px solid #fbbf24;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .childish-theme .high-score-container {
@@ -226,7 +226,7 @@
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 #0284c7;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
 }
 
 .childish-theme .game-button:hover {
