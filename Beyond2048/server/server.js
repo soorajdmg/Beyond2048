@@ -7,6 +7,8 @@ const authRoutes = require('./routes/auth');
 
 const app = express();
 
+app.use(express.json());
+
 const allowedOrigins = [
   'http://localhost:5173',
   'https://beyond2048-frontend.onrender.com'
