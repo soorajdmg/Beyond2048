@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useGameContext } from '../contexts/gameContext';
-import './Controls.css';
+import './controls.css';
+
 
 const Controls = () => {
   const { moveUp, moveDown, moveLeft, moveRight } = useGameContext();
