@@ -3,7 +3,7 @@ import { useGameContext } from '../contexts/gameContext';
 import { Info, Trophy, Settings as SettingsIcon, User, X } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
 import { useSettings } from '../contexts/settingsContext';
-import './Navbar.css';
+import './navbar.css';
 import AuthLogin from './login';
 import Signup from './signup';
 import Profile from './profile';

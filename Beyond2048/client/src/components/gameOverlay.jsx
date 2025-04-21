@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGameContext } from '../contexts/gameContext';
-import './GameOverlay.css';
+import './gameOverlay.css';
 
 const GameOverlay = ({ won }) => {
   const { score, highScore, initGame } = useGameContext();

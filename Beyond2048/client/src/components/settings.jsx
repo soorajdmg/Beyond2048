@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { X, Save } from 'lucide-react';
 import { useSettings } from '../contexts/settingsContext';
 import { useAuth } from '../contexts/authContext';
-import './Settings.css';
+import './settings.css';
 
 const Settings = ({ isOpen, onClose }) => {
   const {
