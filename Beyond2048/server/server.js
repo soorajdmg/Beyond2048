@@ -4,13 +4,12 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
-const statsRoutes = require('./routes/stats');
 
 const app = express();
 
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Your React app's URL
+  origin: 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.json());

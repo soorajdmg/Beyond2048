@@ -4,13 +4,11 @@ import './gameTile.css';
 const GameTile = ({ value, position, previousPosition, isNew, isMerged, isMoving }) => {
   const tileRef = useRef(null);
 
-  // Get tile color based on value
   const getTileClass = (value) => {
     if (value === 0) return 'tile-empty';
     return `tile-${value}`;
   };
 
-  // Get font size based on tile value length
   const getFontSizeClass = (value) => {
     if (value === 0) return '';
     const length = value.toString().length;
@@ -20,10 +18,8 @@ const GameTile = ({ value, position, previousPosition, isNew, isMerged, isMoving
     return 'font-xsmall';
   };
 
-  // Apply merge animation directly using Web Animations API
   useEffect(() => {
     if (isMerged && tileRef.current) {
-      // Create merge animation
       const mergeAnimation = tileRef.current.animate(
         [
           { transform: 'scale(1)', opacity: 0.9 },
@@ -36,7 +32,6 @@ const GameTile = ({ value, position, previousPosition, isNew, isMerged, isMoving
         }
       );
 
-      // Create flash effect
       const flash = document.createElement('div');
       flash.style.position = 'absolute';
       flash.style.top = '0';
@@ -62,7 +57,6 @@ const GameTile = ({ value, position, previousPosition, isNew, isMerged, isMoving
         }
       );
 
-      // Clean up flash element after animation
       flashAnimation.onfinish = () => {
         if (tileRef.current && tileRef.current.contains(flash)) {
           tileRef.current.removeChild(flash);
@@ -71,7 +65,6 @@ const GameTile = ({ value, position, previousPosition, isNew, isMerged, isMoving
     }
   }, [isMerged, value]);
 
-  // Calculate tile position and apply animation
   useEffect(() => {
     if (isMoving && !isNew && previousPosition && tileRef.current) {
       const tile = tileRef.current;
@@ -80,7 +73,6 @@ const GameTile = ({ value, position, previousPosition, isNew, isMerged, isMoving
       const startX = (previousPosition.col - position.col) * cellSize;
       const startY = (previousPosition.row - position.row) * cellSize;
 
-      // Use Web Animation API for movement
       tile.animate(
         [
           { transform: `translate(${startX}px, ${startY}px)` },

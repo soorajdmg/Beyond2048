@@ -26,13 +26,11 @@ const AuthLogin = ({ onSuccess, onClose, switchToSignup }) => {
     try {
       console.log("About to send login request with:", { username, password: "********" });
       
-      // Use the login function from AuthContext
       const result = await login(username, password);
       
       console.log('Login result:', result);
       
       if (result) {
-        // Call onSuccess with the user data
         console.log('Login successful, calling onSuccess');
         onSuccess(result, localStorage.getItem('token'));
       } else {

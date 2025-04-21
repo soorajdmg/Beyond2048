@@ -1,9 +1,6 @@
-// File: /controllers/statsController.js
-
-const User = require('../models/user'); // Import your User model
+const User = require('../models/user'); 
 
 /**
- * Get user statistics
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
@@ -11,12 +8,10 @@ exports.getUserStats = async (req, res) => {
   try {
     const userId = req.user?._id?.toString();
 
-    // If user ID is not available in token
     if (!req.user) {
       return res.status(401).json({ success: false, message: 'Unauthorized: No user in request' });
     }
 
-    // Find user in MongoDB
     const user = await User.findById(userId);
 
     if (!user) {
@@ -26,7 +21,6 @@ exports.getUserStats = async (req, res) => {
       });
     }
 
-    // Get stats from user document
     const stats = {
       highestTile: user.highestTile || 0,
       bestScore: user.bestScore || 0,
@@ -50,7 +44,6 @@ exports.getUserStats = async (req, res) => {
 };
 
 /**
- * Update user statistics
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
@@ -73,7 +66,6 @@ exports.updateUserStats = async (req, res) => {
       timePlayed
     } = req.body;
 
-    // Validate input
     if (typeof score !== 'number' || typeof highestTile !== 'number') {
       return res.status(400).json({
         success: false,
@@ -81,7 +73,6 @@ exports.updateUserStats = async (req, res) => {
       });
     }
 
-    // Find user in MongoDB
     const user = await User.findById(userId);
 
     if (!user) {
@@ -163,7 +154,6 @@ exports.updateUserStats = async (req, res) => {
 };
 
 /**
- * Reset user statistics
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
@@ -187,7 +177,6 @@ exports.resetUserStats = async (req, res) => {
         totalMoves: 0,
         averageScore: 0,
         gameHistory: []
-        // Add minutesPlayed: 0 if you also want to reset time played
       }
     };
 
@@ -208,7 +197,6 @@ exports.resetUserStats = async (req, res) => {
 };
 
 /**
- * Get leaderboard
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */

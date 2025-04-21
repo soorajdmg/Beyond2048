@@ -1,4 +1,3 @@
-/* Auth Modal Container */
 .auth-container {
   background-color: #faf8ef;
   border-radius: 0.5rem;
@@ -22,7 +21,6 @@
   }
 }
 
-/* Auth Form Layout */
 .auth-form {
   padding: 1.5rem;
   padding: 1.5rem 2rem;
@@ -37,7 +35,6 @@
   text-align: center;
 }
 
-/* Form Group Styling */
 .form-group {
   margin-bottom: 1.25rem;
 }
@@ -69,7 +66,6 @@
   color: #9ca3af;
 }
 
-/* Auth Button */
 .auth-button {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -97,7 +93,6 @@
   cursor: not-allowed;
 }
 
-/* Error message */
 .auth-error {
   background-color: #fee2e2;
   color: #ef4444;
@@ -107,7 +102,6 @@
   font-size: 0.9rem;
 }
 
-/* Link styling */
 .auth-message {
   text-align: center;
   margin-top: 1.5rem;
@@ -129,7 +123,6 @@
   color: #9f8b77;
 }
 
-/* Spinner animation */
 .spin {
   animation: spin 1s linear infinite;
 }
@@ -156,7 +149,6 @@
   padding-bottom: 0;
 }
 
-/* Classic Theme */
 .classic-theme .auth-modal {
   background-color: #f0e6d2;
   border: 2px solid #a89984;
@@ -173,7 +165,6 @@
 
 .classic-theme .form-group label {
   color: #4b3621;
-  /* Rich brown color */
   font-weight: 600;
 }
 
@@ -223,7 +214,6 @@
   color: #8b4513;
 }
 
-/* Dark Theme */
 .dark-theme .auth-modal {
   background-color: #1a202c;
   color: #e2e8f0;
@@ -274,7 +264,6 @@
   color: #f87171;
 }
 
-/* Neon Theme */
 .neon-theme .auth-modal {
   background-color: #0f172a;
   color: #e2e8f0;
@@ -335,7 +324,6 @@
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
 }
 
-/* Childish Theme */
 .childish-theme .auth-modal {
   background-color: #fffbeb;
   color: #92400e;
@@ -392,8 +380,6 @@
   color: #ef4444;
 }
 
-
-/* Responsive Styles */
 @media (max-width: 480px) {
   .auth-modal {
     width: 95%;

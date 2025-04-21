@@ -10,27 +10,19 @@ const AuthLogout = ({ onSuccess, onClose }) => {
   const { logout } = useAuth();
 
   const handleLogout = async () => {
-    console.log("Processing logout...");
     setError('');
     setIsLoading(true);
 
     try {
-      console.log("About to send logout request");
-
-      // Use the logout function from AuthContext
       const result = await logout();
 
-      console.log('Logout result:', result);
-
       if (result.success) {
-        // Call onSuccess to notify parent component
         console.log(result.message);
         onSuccess();
       } else {
         setError('Logout failed. Please try again.');
       }
     } catch (err) {
-      console.error('Error details:', err);
       setError('Logout failed. Please try again later.');
     } finally {
       setIsLoading(false);

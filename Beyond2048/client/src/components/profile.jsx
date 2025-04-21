@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { LogOut, X, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
-import { useSettings } from '../contexts/settingsContext'; // Changed to use settingsContext directly
+import { useSettings } from '../contexts/settingsContext';
 import './profile.css';
 
 const Profile = ({
     onClose,
     onLogout,
 }) => {
-    // Use the enhanced auth context
     const {
         currentUser,
         userStats,
@@ -17,31 +16,24 @@ const Profile = ({
         fetchUserStats
     } = useAuth();
 
-    // Use settings context directly - similar to LeaderboardModal
     const { gameSettings } = useSettings();
     
     const [loading, setLoading] = useState(authLoading);
     const [error, setError] = useState(null);
-    // Add ref for the modal content
     const modalRef = useRef(null);
     
-    // Create local state for theme that mirrors the context
     const currentTheme = gameSettings?.theme || 'classic';
     const isDarkTheme = currentTheme === 'dark' || currentTheme === 'neon';
 
     const formatTimePlayed = (minutes) => {
-        // Round to 2 decimal places for display purposes
         const roundedMinutes = Math.round(minutes * 100) / 100;
 
         if (roundedMinutes < 60) {
-            // For times less than 1 hour, show as minutes with up to 2 decimal places
             return `${roundedMinutes.toFixed(1).replace(/\.0$/, '')} min`;
         } else {
-            // For times >= 1 hour, split into hours and minutes
             const hours = Math.floor(roundedMinutes / 60);
             const mins = Math.round(roundedMinutes % 60);
 
-            // Handle case where minutes round up to 60
             if (mins === 60) {
                 return `${hours + 1}h 0m`;
             }
@@ -50,7 +42,6 @@ const Profile = ({
         }
     };
 
-    // Refresh user stats
     const refreshStats = async () => {
         try {
             setLoading(true);
@@ -64,7 +55,6 @@ const Profile = ({
         }
     };
 
-    // Close modal when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -72,30 +62,24 @@ const Profile = ({
             }
         };
 
-        // Add event listener
         document.addEventListener('mousedown', handleClickOutside);
 
-        // Clean up the event listener
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [onClose]);
 
-    // Check authentication status and load user data when component mounts
-    // or when auth state changes
     useEffect(() => {
         if (!isAuthenticated) {
             setError('You must be logged in to view profile data');
             setLoading(false);
         } else if (isAuthenticated && !userStats) {
-            // If authenticated but no stats yet, fetch them
             refreshStats();
         } else {
             setLoading(false);
         }
     }, [isAuthenticated, userStats]);
 
-    // Combine user and stats data
     const userData = currentUser ? {
         ...currentUser,
         bestScore: userStats?.bestScore || 0,

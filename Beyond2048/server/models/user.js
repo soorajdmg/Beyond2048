@@ -21,7 +21,6 @@ const userSettingsSchema = new mongoose.Schema({
     }
 }, { _id: false });
 
-// Define a sub-schema for game history records
 const gameHistorySchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
     score: { type: Number, required: true },
@@ -42,7 +41,6 @@ const UserSchema = new mongoose.Schema({
         default: () => ({})
     },
 
-    // Stats fields
     bestScore: { type: Number, default: 0 },
     highestTile: { type: Number, default: 0 },
     gamesPlayed: { type: Number, default: 0 },

@@ -36,21 +36,18 @@ const Game = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
-  // Load high score from userStats
   useEffect(() => {
     if (userStats) {
       updateHighScore(userStats.bestScore);
     }
   }, [userStats, updateHighScore]);
 
-  // Update high score when score changes
   useEffect(() => {
     if (score > highScore) {
       updateHighScore(score);
     }
   }, [score, highScore]);
 
-  // Handle keyboard events
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (isAnimating || gameOver) return;
@@ -83,7 +80,6 @@ const Game = () => {
     };
   }, [isAnimating, gameOver, moveUp, moveDown, moveLeft, moveRight]);
 
-  // Handle touch events for mobile
   const handleTouchStart = (e) => {
     setTouchStart({
       x: e.touches[0].clientX,
@@ -105,16 +101,13 @@ const Game = () => {
     const diffX = touchStart.x - touchEnd.x;
     const diffY = touchStart.y - touchEnd.y;
 
-    // Determine the direction of the swipe (with a minimum threshold of 20px)
     if (Math.abs(diffX) > Math.abs(diffY)) {
-      // Horizontal swipe
       if (diffX > 20) {
         moveLeft();
       } else if (diffX < -20) {
         moveRight();
       }
     } else {
-      // Vertical swipe
       if (diffY > 20) {
         moveUp();
       } else if (diffY < -20) {
@@ -129,7 +122,6 @@ const Game = () => {
   return (
     <div className="game-container">
       <div className="game-layout">
-        {/* Left side - Score and High Score */}
         <div className="game-side-panel score-panel">
           <div className="score-container">
             <div className="score-label">Score</div>
@@ -142,7 +134,6 @@ const Game = () => {
           </div>
         </div>
 
-        {/* Center - Game Board */}
         <div
           className="game-board"
           onTouchStart={handleTouchStart}
@@ -172,7 +163,6 @@ const Game = () => {
           }
         </div>
 
-        {/* Right side - Control Buttons */}
         <div className="game-side-panel controls-panel">
           <button
             onClick={undo}

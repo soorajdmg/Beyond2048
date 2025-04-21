@@ -2,13 +2,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
-// Register a new user
 exports.signup = async (req, res) => {
   console.log('Request body:', req.body);
   try {
     const { name, username, password } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({
@@ -19,7 +17,6 @@ exports.signup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const user = new User({
       name,
       username,
@@ -27,17 +24,14 @@ exports.signup = async (req, res) => {
     });
 
     console.log('Password before saving:', user.password);
-    // Save user to database
     await user.save();
 
-    // Generate JWT token
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
 
-    // Get initial stats (empty)
     const stats = {
       gamesPlayed: 0,
       highScore: 0,
@@ -67,12 +61,10 @@ exports.signup = async (req, res) => {
   }
 };
 
-// Login user
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Check if user exists
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).json({
@@ -81,7 +73,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Check if password is correct
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
@@ -90,16 +81,12 @@ exports.login = async (req, res) => {
       });
     }
 
-
-    // Generate JWT token
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
 
-    // Get user stats from database (assuming stats are stored in user document)
-    // Or you can query from a separate stats collection
     const stats = user.stats || {
       gamesPlayed: 0,
       highScore: 0,
@@ -129,7 +116,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// Logout user
 exports.logout = async (req, res) => {
   try {
     res.status(200).json({
@@ -146,7 +132,6 @@ exports.logout = async (req, res) => {
   }
 };
 
-// Verify user token and return user data (used by frontend for auth checks)
 exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -158,7 +143,6 @@ exports.getUser = async (req, res) => {
       });
     }
 
-    // Get user stats data
     const stats = {
       gamesPlayed: user.gamesPlayed || 0,
       bestScore: user.bestScore || 0,
@@ -171,7 +155,6 @@ exports.getUser = async (req, res) => {
       minutesPlayed: user.minutesPlayed || 0
     };
 
-    // Get the 10 most recent games from the user's game history
     const recentGames = user.gameHistory ?
       user.gameHistory
         .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -199,28 +182,22 @@ exports.getUser = async (req, res) => {
   }
 };
 
-// Update user profile and stats
 exports.updateProfile = async (req, res) => {
   try {
     const { name, username, stats } = req.body;
 
-    // Build update object
     const updateData = {};
     if (name) updateData.name = name;
     if (username) updateData.username = username;
 
-    // If user wants to change password
     if (req.body.password) {
       updateData.password = req.body.password;
-      // Note: Password hashing should be handled by a pre-save hook in the User model
     }
 
-    // Update stats if provided
     if (stats) {
       updateData.stats = stats;
     }
 
-    // Update user
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { $set: updateData },
@@ -260,7 +237,6 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Get user profile with stats
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
@@ -273,7 +249,6 @@ exports.getProfile = async (req, res) => {
       });
     }
 
-    // Get stats or provide default empty stats
     const stats = user.stats || {
       gamesPlayed: 0,
       highScore: 0,
@@ -303,7 +278,6 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// NEW: Get user stats
 exports.getStats = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -315,7 +289,6 @@ exports.getStats = async (req, res) => {
       });
     }
 
-    // Get stats or provide default empty stats
     const stats = {
       bestScore: user.bestScore || 0,
       highestTile: user.highestTile || 0,
@@ -341,14 +314,12 @@ exports.getStats = async (req, res) => {
   }
 };
 
-// NEW: Save game stats
 exports.saveGameStats = async (req, res) => {
   try {
     console.log("Request from frontend: ", req)
     const userId = req.user.id;
     const { score, highestTile, moves, result, won, timePlayed, date } = req.body;
 
-    // Validate required fields
     if (score === undefined) {
       return res.status(400).json({
         success: false,
@@ -356,7 +327,6 @@ exports.saveGameStats = async (req, res) => {
       });
     }
 
-    // Get user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -374,13 +344,11 @@ exports.saveGameStats = async (req, res) => {
     user.averageScore = user.averageScore || 0;
     user.minutesPlayed = user.minutesPlayed || 0;
 
-    // Update stats
     user.gamesPlayed += 1;
     user.totalScore += score;
     user.totalMoves += moves;
     user.minutesPlayed += timePlayed / 60;
 
-    // Update high score if current score is higher
     if (score > user.bestScore) {
       user.bestScore = score;
     }
@@ -389,34 +357,26 @@ exports.saveGameStats = async (req, res) => {
       user.highestTile = highestTile;
     }
 
-
-    // Update win count if game was completed
     if (won) {
       user.totalWins = (user.totalWins || 0) + 1;
     }
 
-    // Calculate average score and win rate
     user.averageScore = user.gamesPlayed > 0 ? (Math.round(user.totalScore / user.gamesPlayed)) : 0;
 
-
-    // Add game to history
     const gameRecord = {
       date: new Date(date) || new Date(),
       score,
       highestTile,
       moves,
-      result: result?.toUpperCase(),  // Convert to uppercase to match the enum
+      result: result?.toUpperCase(),
       won,
       timePlayed: timePlayed / 60,
       completed: "true"
     };
     user.gameHistory.push(gameRecord);
 
-
-    // Save updated user with new stats
     await user.save();
 
-    // Return updated stats
     res.status(200).json({
       success: true,
       message: 'Game stats saved successfully',
@@ -429,7 +389,6 @@ exports.saveGameStats = async (req, res) => {
           won,
           timePlayed,
           date
-          // completed
         },
         stats: user
       }
@@ -492,7 +451,6 @@ exports.getUserSettings = async (req, res) => {
       });
     }
 
-    // If user has no settings yet, return default settings
     const settings = user.settings || {
       theme: 'classic',
       gameSize: 4,
@@ -514,13 +472,11 @@ exports.getUserSettings = async (req, res) => {
   }
 };
 
-// Update user settings
 exports.updateUserSettings = async (req, res) => {
   try {
     const userId = req.user.id;
     const { settings } = req.body;
 
-    // Validate settings object
     if (!settings) {
       return res.status(400).json({
         success: false,
@@ -528,7 +484,6 @@ exports.updateUserSettings = async (req, res) => {
       });
     }
 
-    // Ensure settings has the correct structure
     const validatedSettings = {
       theme: settings.theme || 'classic',
       gameSize: settings.gameSize || 4,
@@ -536,7 +491,6 @@ exports.updateUserSettings = async (req, res) => {
       animations: settings.animations !== undefined ? settings.animations : true
     };
 
-    // Update the user's settings
     const user = await User.findByIdAndUpdate(
       userId,
       { settings: validatedSettings },
@@ -565,12 +519,10 @@ exports.updateUserSettings = async (req, res) => {
   }
 };
 
-// Reset user settings to default
 exports.resetUserSettings = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Default settings
     const defaultSettings = {
       theme: 'classic',
       gameSize: 4,
@@ -578,7 +530,6 @@ exports.resetUserSettings = async (req, res) => {
       animations: true
     };
 
-    // Update the user's settings to default
     const user = await User.findByIdAndUpdate(
       userId,
       { settings: defaultSettings },

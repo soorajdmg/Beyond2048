@@ -1,4 +1,3 @@
-/* Game Overlay Base Styles */
 .game-overlay {
   position: absolute;
   inset: 0;
@@ -54,10 +53,6 @@
   outline-offset: 2px;
 }
 
-/* Classic Theme - Default */
-/* (Default styles already defined above) */
-
-/* Dark Theme */
 .dark-theme .game-overlay {
   background-color: rgba(0, 0, 0, 0.7);
 }
@@ -88,7 +83,6 @@
   outline: 2px solid #4a5568;
 }
 
-/* Neon Theme */
 .neon-theme .game-overlay {
   background-color: rgba(15, 23, 42, 0.8);
 }
@@ -145,20 +139,19 @@
   }
 }
 
-/* Childish Theme */
 .childish-theme .game-overlay {
   background-color: rgba(252, 211, 77, 0.4);
 }
 
 .childish-theme .overlay-content {
-  background-color: #fef3c7; /* Soft yellow background */
+  background-color: #fef3c7; 
   border-radius: 1rem;
   box-shadow: 0 5px 0 rgba(251, 146, 60, 0.4);
   border: 3px solid #fbbf24;
 }
 
 .childish-theme .overlay-title {
-  color: #92400e; /* Brown text */
+  color: #92400e; 
   font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
@@ -168,7 +161,7 @@
 }
 
 .childish-theme .overlay-button {
-  background-color: #ec4899; /* Hot Pink */
+  background-color: #ec4899; 
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 #be185d;
@@ -207,7 +200,6 @@
   }
 }
 
-/* Animations */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -228,7 +220,6 @@
   }
 }
 
-/* Responsive adjustments */
 @media (min-width: 640px) {
   .overlay-title {
     font-size: 1.875rem;
@@ -244,7 +235,6 @@
   }
 }
 
-/* Accessibility - Reduced Motion */
 @media (prefers-reduced-motion) {
   .game-overlay,
   .overlay-content {

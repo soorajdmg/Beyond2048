@@ -1,17 +1,11 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { useAuth } from './authContext';
 
-// Create context
-export const GameContext = createContext(); 
-
-// Custom hook to use the game context
+export const GameContext = createContext();
 export const useGameContext = () => useContext(GameContext);
-
 export const GameProvider = ({ children }) => {
-  // Get the auth context functions
   const { saveGameStats, isAuthenticated } = useAuth();
 
-  // Core game state
   const [board, setBoard] = useState([]);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
@@ -20,12 +14,10 @@ export const GameProvider = ({ children }) => {
   const [history, setHistory] = useState([]);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Animation states
   const [tilePositions, setTilePositions] = useState({});
   const [mergedTiles, setMergedTiles] = useState({});
   const [newTiles, setNewTiles] = useState({});
 
-  // Player statistics
   const [playerStats, setPlayerStats] = useState({
     highestTile: 0,
     bestScore: 0,
@@ -37,7 +29,6 @@ export const GameProvider = ({ children }) => {
     recentGames: []
   });
 
-  // Game settings
   const [gameSettings, setGameSettings] = useState({
     theme: 'classic',
     gameSize: 4,
@@ -45,27 +36,22 @@ export const GameProvider = ({ children }) => {
     animations: true
   });
 
-  
 
 
-  // Time tracking for statistics
+
   const [gameStartTime, setGameStartTime] = useState(null);
 
-  // Initialize the game and load high score
   useEffect(() => {
-    // Load high score from localStorage
     const savedHighScore = localStorage.getItem('2048HighScore');
     if (savedHighScore) {
       setHighScore(parseInt(savedHighScore, 10));
     }
 
-    // Load player stats
     const savedStats = localStorage.getItem('playerStats');
     if (savedStats) {
       setPlayerStats(JSON.parse(savedStats));
     }
 
-    // Load game settings
     const savedSettings = localStorage.getItem('gameSettings');
     if (savedSettings) {
       setGameSettings(JSON.parse(savedSettings));
@@ -74,13 +60,11 @@ export const GameProvider = ({ children }) => {
     initGame();
   }, []);
 
-  // Update high score when current score increases
   useEffect(() => {
     if (score > highScore) {
       setHighScore(score);
       localStorage.setItem('2048HighScore', score.toString());
 
-      // Update in player stats
       updatePlayerStats({
         bestScore: score
       });
@@ -105,7 +89,6 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  // Save game stats to database - new function
   const saveGameStatsToDatabase = (gameResult) => {
     if (isAuthenticated) {
       console.log("Current time:", new Date());
@@ -135,14 +118,11 @@ export const GameProvider = ({ children }) => {
   const initGame = useCallback(() => {
     const size = gameSettings.gameSize || 4;
 
-    // Create empty board
     const newBoard = Array(size).fill(0).map(() => Array(size).fill(0));
 
-    // Add two initial tiles
     addRandomTile(newBoard);
     addRandomTile(newBoard);
 
-    // Update player stats - increment games played
     updatePlayerStats({
       gamesPlayed: playerStats.gamesPlayed + 1
     });
@@ -157,10 +137,8 @@ export const GameProvider = ({ children }) => {
     setMergedTiles({});
     setNewTiles({});
 
-    // Start the game timer
     startGameTimer();
 
-    // Initialize new tiles animation for the starting tiles
     const newTilesState = {};
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
@@ -171,7 +149,6 @@ export const GameProvider = ({ children }) => {
     }
     setNewTiles(newTilesState);
 
-    // Clear the new tiles animation after animation completes
     setTimeout(() => {
       setNewTiles({});
     }, 300);
@@ -189,25 +166,20 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // No empty tiles, game is over
     if (emptyTiles.length === 0) {
       console.log("No empty cells available to add a new tile");
       return false;
     }
 
-    // Select random empty position
     const { row, col } = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
 
-    // Place a 2 (90% chance) or 4 (10% chance)
     board[row][col] = Math.random() < 0.9 ? 2 : 4;
 
-    // Mark this tile as new for animation
     setNewTiles(prev => ({
       ...prev,
       [`${row}-${col}`]: true
     }));
 
-    // Clear the new tile animation after it completes
     setTimeout(() => {
       setNewTiles(prev => {
         const updated = { ...prev };
@@ -236,7 +208,6 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  // Get highest tile value on the board
   const getHighestTile = (currentBoard) => {
     let highest = 0;
 
@@ -249,18 +220,15 @@ export const GameProvider = ({ children }) => {
     return highest;
   };
 
-  // Check if the game is over
   const checkGameOver = (board) => {
     console.log("Checking for game over...");
     console.log("Current Board State:", JSON.stringify(board));
-    
-    // Check for 2048 tile (win condition)
+
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] === 2048) {
           console.log(`2048 tile found at position [${i}][${j}]. Game is won!`);
-          
-          // If game not already marked as over, update stats for a win
+
           if (!gameOver) {
             const newGame = {
               date: new Date().toLocaleDateString(),
@@ -268,26 +236,25 @@ export const GameProvider = ({ children }) => {
               score: score,
               highestTile: 2048
             };
-            
+
             console.log("Logging new game result:", newGame);
             addRecentGame(newGame);
             updateTimePlayedStat();
-            
+
             console.log("Updating player winning streak...");
             updatePlayerStats({
               winningStreak: playerStats.winningStreak + 1 || 1
             });
-            
+
             console.log("Saving game stats to database as a win...");
             saveGameStatsToDatabase('win');
           }
-          
+
           return true;
         }
       }
     }
 
-    // Check for empty tiles
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] === 0) {
@@ -297,7 +264,6 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // Check for possible merges horizontally
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length - 1; j++) {
         if (board[i][j] === board[i][j + 1]) {
@@ -307,7 +273,6 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // Check for possible merges vertically
     for (let i = 0; i < board.length - 1; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] === board[i + 1][j]) {
@@ -317,7 +282,6 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // If game over and not already marked as over, update stats for a loss
     if (!gameOver) {
       console.log("No empty tiles or possible merges. Game is over.");
 
@@ -346,7 +310,6 @@ export const GameProvider = ({ children }) => {
     return true;
   };
 
-  // Movement functions
   const moveLeft = () => {
     if (gameOver || isAnimating) return;
 
@@ -360,7 +323,6 @@ export const GameProvider = ({ children }) => {
     const newMergedTiles = {};
     const newPositions = {};
 
-    // Record initial positions
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] !== 0) {
@@ -369,12 +331,10 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // Process each row
     for (let i = 0; i < board.length; i++) {
       let row = [];
       let colMap = {};
 
-      // Copy non-zero values and track original positions
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] !== 0) {
           row.push(board[i][j]);
@@ -382,43 +342,34 @@ export const GameProvider = ({ children }) => {
         }
       }
 
-      // Merge tiles
       for (let j = 0; j < row.length - 1; j++) {
         if (row[j] === row[j + 1]) {
           row[j] *= 2;
           newScore += row[j];
 
-          // Check if this created a new highest tile
           newHighestTile = Math.max(newHighestTile, row[j]);
 
-          // Mark as merged for animation
           newMergedTiles[`${i}-${j}`] = true;
 
-          // Track which tiles were merged
           const origCol1 = colMap[j];
           const origCol2 = colMap[j + 1];
 
-          // Update position tracking for the merged tiles
           newPositions[`${i}-${origCol1}`] = { row: i, col: j, value: row[j] };
           newPositions[`${i}-${origCol2}`] = { row: i, col: j, value: 0, merged: true };
 
-          // Update the column mapping for remaining tiles
           for (let k = j + 1; k < row.length - 1; k++) {
             colMap[k] = colMap[k + 1];
           }
 
           row.splice(j + 1, 1);
 
-          // Check for win (2048 tile)
           if (row[j] === 2048 && !won) {
             setWon(true);
 
-            // Update player stats
             updatePlayerStats({
               winningStreak: playerStats.winningStreak + 1
             });
 
-            // Add to recent games
             const newGame = {
               date: new Date().toLocaleDateString(),
               result: 'win',
@@ -428,14 +379,11 @@ export const GameProvider = ({ children }) => {
 
             addRecentGame(newGame);
             updateTimePlayedStat();
-
-            // Save win stats to database
             saveGameStatsToDatabase('win');
           }
         }
       }
 
-      // Update positions for non-merged tiles
       for (let j = 0; j < row.length; j++) {
         const origCol = colMap[j];
         if (origCol !== j) {
@@ -446,12 +394,10 @@ export const GameProvider = ({ children }) => {
         }
       }
 
-      // Pad with zeros
       while (row.length < board[i].length) {
         row.push(0);
       }
 
-      // Check if the row changed
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] !== row[j]) {
           moved = true;
@@ -461,11 +407,9 @@ export const GameProvider = ({ children }) => {
       board[i] = row;
     }
 
-    // Update animation states
     setTilePositions(newPositions);
     setMergedTiles(newMergedTiles);
 
-    // Update player stats if moved
     if (moved) {
       updatePlayerStats({
         totalMoves: playerStats.totalMoves + 1,
@@ -489,7 +433,6 @@ export const GameProvider = ({ children }) => {
     const newMergedTiles = {};
     const newPositions = {};
 
-    // Record initial positions
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] !== 0) {
@@ -498,12 +441,10 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // Process each row
     for (let i = 0; i < board.length; i++) {
       let row = [];
       let colMap = {};
 
-      // Copy non-zero values and track original positions
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] !== 0) {
           row.push(board[i][j]);
@@ -511,46 +452,36 @@ export const GameProvider = ({ children }) => {
         }
       }
 
-      // Merge tiles (right to left)
       for (let j = row.length - 1; j > 0; j--) {
         if (row[j] === row[j - 1]) {
           row[j] *= 2;
           newScore += row[j];
 
-          // Check if this created a new highest tile
           newHighestTile = Math.max(newHighestTile, row[j]);
 
-          // Target column in the final state
           const targetCol = board[i].length - (row.length - j);
 
-          // Mark as merged for animation
           newMergedTiles[`${i}-${targetCol}`] = true;
 
-          // Track which tiles were merged
           const origCol1 = colMap[j];
           const origCol2 = colMap[j - 1];
 
-          // Update position tracking for the merged tiles
           newPositions[`${i}-${origCol1}`] = { row: i, col: targetCol, value: row[j] };
           newPositions[`${i}-${origCol2}`] = { row: i, col: targetCol, value: 0, merged: true };
 
-          // Update the column mapping for remaining tiles
           for (let k = j - 1; k > 0; k--) {
             colMap[k] = colMap[k - 1];
           }
 
           row.splice(j - 1, 1);
 
-          // Check for win (2048 tile)
           if (row[j] === 2048 && !won) {
             setWon(true);
 
-            // Update player stats
             updatePlayerStats({
               winningStreak: playerStats.winningStreak + 1
             });
 
-            // Add to recent games
             const newGame = {
               date: new Date().toLocaleDateString(),
               result: 'win',
@@ -560,19 +491,15 @@ export const GameProvider = ({ children }) => {
 
             addRecentGame(newGame);
             updateTimePlayedStat();
-
-            // Save win stats to database
             saveGameStatsToDatabase('win');
           }
         }
       }
 
-      // Pad with zeros at the beginning
       while (row.length < board[i].length) {
         row.unshift(0);
       }
 
-      // Update positions for non-merged tiles
       for (let j = 0; j < row.length; j++) {
         if (row[j] !== 0) {
           const originalIndex = row.length - 1 - j;
@@ -586,7 +513,6 @@ export const GameProvider = ({ children }) => {
         }
       }
 
-      // Check if the row changed
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] !== row[j]) {
           moved = true;
@@ -596,11 +522,9 @@ export const GameProvider = ({ children }) => {
       board[i] = row;
     }
 
-    // Update animation states
     setTilePositions(newPositions);
     setMergedTiles(newMergedTiles);
 
-    // Update player stats if moved
     if (moved) {
       updatePlayerStats({
         totalMoves: playerStats.totalMoves + 1,
@@ -624,7 +548,6 @@ export const GameProvider = ({ children }) => {
     const newMergedTiles = {};
     const newPositions = {};
 
-    // Record initial positions
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] !== 0) {
@@ -633,12 +556,10 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // Process each column
     for (let j = 0; j < board[0].length; j++) {
       let column = [];
       let rowMap = {};
 
-      // Copy non-zero values and track original positions
       for (let i = 0; i < board.length; i++) {
         if (board[i][j] !== 0) {
           column.push(board[i][j]);
@@ -646,43 +567,34 @@ export const GameProvider = ({ children }) => {
         }
       }
 
-      // Merge tiles
       for (let i = 0; i < column.length - 1; i++) {
         if (column[i] === column[i + 1]) {
           column[i] *= 2;
           newScore += column[i];
 
-          // Check if this created a new highest tile
           newHighestTile = Math.max(newHighestTile, column[i]);
 
-          // Mark as merged for animation
           newMergedTiles[`${i}-${j}`] = true;
 
-          // Track which tiles were merged
           const origRow1 = rowMap[i];
           const origRow2 = rowMap[i + 1];
 
-          // Update position tracking for the merged tiles
           newPositions[`${origRow1}-${j}`] = { row: i, col: j, value: column[i] };
           newPositions[`${origRow2}-${j}`] = { row: i, col: j, value: 0, merged: true };
 
-          // Update the row mapping for remaining tiles
           for (let k = i + 1; k < column.length - 1; k++) {
             rowMap[k] = rowMap[k + 1];
           }
 
           column.splice(i + 1, 1);
 
-          // Check for win (2048 tile)
           if (column[i] === 2048 && !won) {
             setWon(true);
 
-            // Update player stats
             updatePlayerStats({
               winningStreak: playerStats.winningStreak + 1
             });
 
-            // Add to recent games
             const newGame = {
               date: new Date().toLocaleDateString(),
               result: 'win',
@@ -692,14 +604,11 @@ export const GameProvider = ({ children }) => {
 
             addRecentGame(newGame);
             updateTimePlayedStat();
-
-            // Save win stats to database
             saveGameStatsToDatabase('win');
           }
         }
       }
 
-      // Update positions for non-merged tiles
       for (let i = 0; i < column.length; i++) {
         const origRow = rowMap[i];
         if (origRow !== i) {
@@ -710,12 +619,10 @@ export const GameProvider = ({ children }) => {
         }
       }
 
-      // Pad with zeros
       while (column.length < board.length) {
         column.push(0);
       }
 
-      // Update board and check if changed
       for (let i = 0; i < board.length; i++) {
         if (board[i][j] !== column[i]) {
           moved = true;
@@ -724,11 +631,9 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // Update animation states
     setTilePositions(newPositions);
     setMergedTiles(newMergedTiles);
 
-    // Update player stats if moved
     if (moved) {
       updatePlayerStats({
         totalMoves: playerStats.totalMoves + 1,
@@ -752,7 +657,6 @@ export const GameProvider = ({ children }) => {
     const newMergedTiles = {};
     const newPositions = {};
 
-    // Record initial positions
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] !== 0) {
@@ -761,12 +665,10 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // Process each column
     for (let j = 0; j < board[0].length; j++) {
       let column = [];
       let rowMap = {};
 
-      // Copy non-zero values and track original positions
       for (let i = 0; i < board.length; i++) {
         if (board[i][j] !== 0) {
           column.push(board[i][j]);
@@ -774,46 +676,36 @@ export const GameProvider = ({ children }) => {
         }
       }
 
-      // Merge tiles (bottom to top)
       for (let i = column.length - 1; i > 0; i--) {
         if (column[i] === column[i - 1]) {
           column[i] *= 2;
           newScore += column[i];
 
-          // Check if this created a new highest tile
           newHighestTile = Math.max(newHighestTile, column[i]);
 
-          // Target row in the final state
           const targetRow = board.length - (column.length - i);
 
-          // Mark as merged for animation
           newMergedTiles[`${targetRow}-${j}`] = true;
 
-          // Track which tiles were merged
           const origRow1 = rowMap[i];
           const origRow2 = rowMap[i - 1];
 
-          // Update position tracking for the merged tiles
           newPositions[`${origRow1}-${j}`] = { row: targetRow, col: j, value: column[i] };
           newPositions[`${origRow2}-${j}`] = { row: targetRow, col: j, value: 0, merged: true };
 
-          // Update the row mapping for remaining tiles
           for (let k = i - 1; k > 0; k--) {
             rowMap[k] = rowMap[k - 1];
           }
 
           column.splice(i - 1, 1);
 
-          // Check for win (2048 tile)
           if (column[i] === 2048 && !won) {
             setWon(true);
 
-            // Update player stats
             updatePlayerStats({
               winningStreak: playerStats.winningStreak + 1
             });
 
-            // Add to recent games
             const newGame = {
               date: new Date().toLocaleDateString(),
               result: 'win',
@@ -823,19 +715,15 @@ export const GameProvider = ({ children }) => {
 
             addRecentGame(newGame);
             updateTimePlayedStat();
-
-            // Save win stats to database
             saveGameStatsToDatabase('win');
           }
         }
       }
 
-      // Pad with zeros at the beginning
       while (column.length < board.length) {
         column.unshift(0);
       }
 
-      // Update positions for non-merged tiles
       for (let i = 0; i < column.length; i++) {
         if (column[i] !== 0) {
           const originalIndex = column.length - 1 - i;
@@ -849,7 +737,6 @@ export const GameProvider = ({ children }) => {
         }
       }
 
-      // Update board and check if changed
       for (let i = 0; i < board.length; i++) {
         if (board[i][j] !== column[i]) {
           moved = true;
@@ -858,11 +745,9 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    // Update animation states
     setTilePositions(newPositions);
     setMergedTiles(newMergedTiles);
 
-    // Update player stats if moved
     if (moved) {
       updatePlayerStats({
         totalMoves: playerStats.totalMoves + 1,
@@ -878,10 +763,8 @@ export const GameProvider = ({ children }) => {
     if (moved) {
       setScore(newScore);
       console.log("Setting timeout for adding tile...");
-      // Allow time for slide animations to complete before adding a new tile
       setTimeout(() => {
         console.log("Timeout executed, attempting to add random tile...");
-        // Create a new board with the added tile
         const newBoard = [...board];
 
 
@@ -896,7 +779,6 @@ export const GameProvider = ({ children }) => {
           console.log("Updating board state with new tile");
           setBoard(newBoard);
 
-          // Check if game is over with the updated board
           const isGameOver = checkGameOver(newBoard);
           console.log("Game over check result:", isGameOver);
 
@@ -909,10 +791,8 @@ export const GameProvider = ({ children }) => {
           }
         }
 
-        // Clear merged tiles after animation completes
         setMergedTiles({});
 
-        // End animation state
         setTimeout(() => {
           setIsAnimating(false);
         }, 100);
@@ -922,55 +802,46 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  // Update player statistics
   const updatePlayerStats = useCallback((updates) => {
     setPlayerStats(prev => {
       const newStats = { ...prev, ...updates };
 
-      // Calculate average score if needed
       if (updates.gamesPlayed || updates.bestScore) {
         newStats.averageScore = Math.floor(newStats.bestScore / Math.max(1, newStats.gamesPlayed));
       }
 
-      // Save to localStorage
       localStorage.setItem('playerStats', JSON.stringify(newStats));
 
       return newStats;
     });
   }, []);
 
-  // Add a recent game to the list (keeping only the last 10)
   const addRecentGame = useCallback((game) => {
     setPlayerStats(prev => {
       const updatedRecentGames = [game, ...prev.recentGames].slice(0, 10);
       const newStats = { ...prev, recentGames: updatedRecentGames };
 
-      // Save to localStorage
       localStorage.setItem('playerStats', JSON.stringify(newStats));
 
       return newStats;
     });
   }, []);
 
-  // Update game settings - Wrapped in useCallback to prevent infinite loops
   const updateGameSettings = useCallback((updates) => {
     setGameSettings(prev => {
       const newSettings = { ...prev, ...updates };
 
-      // Save to localStorage
       localStorage.setItem('gameSettings', JSON.stringify(newSettings));
 
       return newSettings;
     });
   }, []);
 
-  // Function to update high score manually
   const updateHighScore = useCallback((newHighScore) => {
     if (newHighScore) {
       setHighScore(newHighScore);
       localStorage.setItem('2048HighScore', newHighScore.toString());
 
-      // Update in player stats
       updatePlayerStats({
         bestScore: newHighScore
       });
@@ -979,7 +850,6 @@ export const GameProvider = ({ children }) => {
 
   return (
     <GameContext.Provider value={{
-      // Game state
       board,
       score,
       highScore,
@@ -988,18 +858,13 @@ export const GameProvider = ({ children }) => {
       history,
       isAnimating,
 
-      // Animation state
       tilePositions,
       mergedTiles,
       newTiles,
 
-      // Player statistics
       playerStats,
-
-      // Game settings
       gameSettings,
 
-      // Game actions
       initGame,
       moveUp,
       moveDown,
@@ -1007,8 +872,6 @@ export const GameProvider = ({ children }) => {
       moveRight,
       undo,
       updateHighScore,
-
-      // Stats and settings management
       updatePlayerStats,
       updateGameSettings
     }}>

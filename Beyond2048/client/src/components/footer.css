@@ -1,9 +1,9 @@
 .footer {
   margin: 1rem auto;
-  width: calc(100% - 2rem); /* Account for left and right margins */
+  width: calc(100% - 2rem);
   text-align: center;
-  box-sizing: border-box; /* Ensure padding and borders are included in width calculation */
-  overflow: hidden; /* Prevent content from overflowing */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .footer-text {
@@ -11,7 +11,7 @@
   font-weight: bold;
   color: #7a8ea8;
   line-height: 1;
-  word-wrap: break-word; /* Ensure long words break properly */
+  word-wrap: break-word;
 }
 
 .footer-text p {
@@ -22,13 +22,12 @@
   margin-top: 0.25rem;
 }
 
-/* Add responsive adjustments */
 @media (max-width: 640px) {
   .footer {
     margin-top: 0.75rem;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
-    width: calc(100% - 1rem); /* Adjust calculation for smaller margins */
+    width: calc(100% - 1rem);
   }
 
   .footer-text {

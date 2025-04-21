@@ -29,10 +29,9 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
-  const [leaderboardOpen, setLeaderboardOpen] = useState(false); // New state for leaderboard modal
-  const [authMode, setAuthMode] = useState(null); // 'login', 'signup', or 'logout'
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [authMode, setAuthMode] = useState(null);
 
-  // Mock player stats (in a real app, this would come from the backend)
   const playerStats = {
     highestTile: 2048,
     bestScore: highScore || 0,
@@ -50,7 +49,6 @@ const Navbar = () => {
     ]
   };
 
-  // Default game settings
   const defaultGameSettings = {
     gameSize: 4,
     difficulty: 'normal',
@@ -63,9 +61,8 @@ const Navbar = () => {
   const infoModalRef = useRef(null);
   const statsModalRef = useRef(null);
   const authModalRef = useRef(null);
-  const leaderboardModalRef = useRef(null); // New ref for leaderboard modal
+  const leaderboardModalRef = useRef(null);
 
-  // Close modals on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (infoOpen && infoModalRef.current && !infoModalRef.current.contains(e.target)) {
@@ -100,7 +97,6 @@ const Navbar = () => {
     if (setting === 'gameSize') initGame();
   };
 
-
   const showProfile = () => {
     if (currentUser) {
       setProfileOpen(true);
@@ -126,17 +122,16 @@ const Navbar = () => {
   const closeInfo = () => setInfoOpen(false);
   const closeProfile = () => setProfileOpen(false);
   const closeStats = () => setStatsOpen(false);
-  const closeLeaderboard = () => setLeaderboardOpen(false); // New function to close leaderboard
+  const closeLeaderboard = () => setLeaderboardOpen(false);
 
   const handleLoginSuccess = (userData, token) => {
     if (!userData) {
       console.error("No user data received on login");
       return;
     }
-    setAuthMode(null); // Close the auth modal
-    setProfileOpen(true); // Immediately open the profile modal
+    setAuthMode(null);
+    setProfileOpen(true);
 
-    // If user has saved settings, apply them here
     if (userData.settings) {
       updateGameSettings(userData.settings);
       if (userData.settings.theme) applyTheme(userData.settings.theme);
@@ -149,10 +144,8 @@ const Navbar = () => {
   };
 
   const handleLogoutSuccess = () => {
-    // Reset user state after logout
-    setAuthMode(null); // Close the auth modal
+    setAuthMode(null);
 
-    // Reset to default settings
     updateGameSettings(defaultGameSettings);
     applyTheme(defaultGameSettings.theme);
   };
@@ -179,7 +172,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Info Modal */}
       {infoOpen && (
         <div className="modal-overlay">
           <div ref={infoModalRef} className={`info-modal ${isDarkTheme ? 'dark' : ''} ${gameSettings?.theme}`}>
@@ -213,13 +205,11 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Settings Component */}
       <Settings
         isOpen={settingsOpen}
         onClose={closeSettings}
       />
 
-      {/* Leaderboard Modal */}
       {leaderboardOpen && (
         <Leaderboard
           theme={gameSettings?.theme || 'default'}
@@ -227,7 +217,6 @@ const Navbar = () => {
         />
       )}
 
-      {/* Profile Component */}
       {profileOpen && (
         <Profile
           currentUser={currentUser}
@@ -238,7 +227,6 @@ const Navbar = () => {
         />
       )}
 
-      {/* Authentication Modal */}
       {authMode && (
         <div className="modal-overlay">
           <div ref={authModalRef} className={`auth-modal ${isDarkTheme ? 'dark' : ''} ${gameSettings?.theme || 'classic'}`}>

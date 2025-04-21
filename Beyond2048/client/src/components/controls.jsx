@@ -6,7 +6,6 @@ import './Controls.css';
 const Controls = () => {
   const { moveUp, moveDown, moveLeft, moveRight } = useGameContext();
 
-  // Add keyboard event handling
   useEffect(() => {
     const handleKeyDown = (event) => {
       switch (event.key) {
@@ -31,10 +30,8 @@ const Controls = () => {
       }
     };
 
-    // Add event listener when component mounts
     window.addEventListener('keydown', handleKeyDown);
 
-    // Clean up event listener when component unmounts
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };

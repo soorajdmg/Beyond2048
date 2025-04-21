@@ -1,21 +1,16 @@
-/* Navbar Theme Variables */
 :root {
-  /* Classic theme navbar */
   --classic-navbar-bg: #bbada0;
   --classic-navbar-button: #8f7a66;
   --classic-navbar-button-hover: #9f8b77;
 
-  /* Dark theme navbar */
   --dark-navbar-bg: #2d3748;
   --dark-navbar-button: #4b5563;
   --dark-navbar-button-hover: #6b7280;
 
-  /* Neon theme navbar */
   --neon-navbar-bg: #0f172a;
   --neon-navbar-button: #3b82f6;
   --neon-navbar-button-hover: #60a5fa;
 
-  /* Childish theme navbar */
   --childish-navbar-bg: #fef3c7;
   --childish-navbar-button: #f59e0b;
   --childish-navbar-button-hover: #fbbf24;
@@ -86,7 +81,6 @@
   outline-offset: 2px;
 }
 
-/* Dark theme navbar */
 .dark-theme .navbar {
   background-color: var(--dark-navbar-bg);
   color: white;
@@ -100,7 +94,6 @@
   background-color: var(--dark-navbar-button-hover);
 }
 
-/* Neon theme navbar */
 .neon-theme .navbar {
   background-color: var(--neon-navbar-bg);
   color: #e2e8f0;
@@ -121,7 +114,6 @@
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.7);
 }
 
-/* Childish theme navbar */
 .childish-theme .navbar {
   background-color: var(--childish-navbar-bg);
   color: #92400e;
@@ -143,7 +135,6 @@
   background-color: var(--childish-navbar-button-hover);
 }
 
-/* Info Modal Styles */
 .info-modal {
   width: 90%;
   max-width: 550px;
@@ -183,7 +174,6 @@
   padding-top: 1rem;
 }
 
-/* Dark Theme */
 .dark-theme .info-modal {
   background-color: #1a202c;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
@@ -220,7 +210,6 @@
   color: white;
 }
 
-/* Neon Theme */
 .neon-theme .info-modal {
   background-color: #0f172a;
   box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
@@ -229,18 +218,15 @@
 
 .neon-theme .info-section h3 {
   color: #00ffff;
-  /* Cyan */
   text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
 }
 
 .neon-theme .info-list li {
   color: #00ffff;
-  /* Electric Blue */
 }
 
 .neon-theme .info-list li strong {
   color: #ff00ff;
-  /* Magenta */
   text-shadow: 0 0 5px rgba(255, 0, 255, 0.7);
 }
 
@@ -268,10 +254,8 @@
   text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
 }
 
-/* Childish Theme */
 .childish-theme .info-modal {
   background-color: #fef3c7;
-  /* Soft yellow background */
   border-radius: 1rem;
   box-shadow: 0 5px 0 rgba(251, 146, 60, 0.4);
   border: 3px solid #fbbf24;
@@ -279,7 +263,6 @@
 
 .childish-theme .info-section h3 {
   color: #92400e;
-  /* Brown text */
   font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
@@ -290,7 +273,6 @@
 
 .childish-theme .info-list li strong {
   color: #db2777;
-  /* Pink */
 }
 
 .childish-theme .modal-header {
@@ -321,7 +303,6 @@
   font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
-/* Responsive styles */
 @media (min-width: 640px) {
   .info-section h3 {
     font-size: 1.25rem;
@@ -336,14 +317,12 @@
   }
 }
 
-/* Accessibility - Reduced Motion */
 @media (prefers-reduced-motion) {
   .info-modal {
     animation: none !important;
   }
 }
 
-/* Stats Modal Styling */
 .stats-modal {
   background-color: #faf8ef;
   border-radius: 0.5rem;
@@ -360,7 +339,6 @@
   color: #f7fafc;
 }
 
-/* Stats Grid Layout */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -446,7 +424,6 @@
   font-weight: 600;
 }
 
-/* Stats Groups */
 .stats-group {
   margin-bottom: 1.5rem;
 }
@@ -477,7 +454,6 @@
   color: #92400e;
 }
 
-/* Recent Games */
 .recent-games {
   display: flex;
   flex-direction: column;
@@ -584,7 +560,6 @@
   color: #92400e;
 }
 
-/* Stats Footer */
 .stats-footer {
   border-top: 1px solid #e5e7eb;
   padding-top: 1rem;
@@ -616,7 +591,6 @@
   font-weight: 600;
 }
 
-/* Theme-specific modal styling for stats */
 .stats-modal.neon {
   background-color: #0f172a;
   color: #e2e8f0;
@@ -642,7 +616,6 @@
   border-radius: 1rem 1rem 0 0;
 }
 
-/* Settings Modal Styling - updated to match game component */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -667,9 +640,6 @@
   }
 }
 
-
-
-/* Responsive Styles */
 @media (min-width: 640px) {
   .navbar {
     flex-direction: row;
