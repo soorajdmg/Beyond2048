@@ -1,8 +1,5 @@
 # 🔢 Beyond 2048
 
- 
- ![Beyond 2048 Gameplaygif]()
-
 A challenging evolution of the classic 2048 game with enhanced features and gameplay mechanics. Push your strategic thinking to new heights!
 
 ## 🚀 Table of Contents
