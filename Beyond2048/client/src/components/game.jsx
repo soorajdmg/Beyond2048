@@ -36,18 +36,7 @@ const Game = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
-  useEffect(() => {
-    if (userStats) {
-      updateHighScore(userStats.bestScore);
-    }
-  }, [userStats, updateHighScore]);
-
-  useEffect(() => {
-    if (score > highScore) {
-      updateHighScore(score);
-    }
-  }, [score, highScore]);
-
+  // Handle keyboard events
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (isAnimating || gameOver) return;
@@ -80,6 +69,7 @@ const Game = () => {
     };
   }, [isAnimating, gameOver, moveUp, moveDown, moveLeft, moveRight]);
 
+  // handle touch events for mobile
   const handleTouchStart = (e) => {
     setTouchStart({
       x: e.touches[0].clientX,
@@ -102,12 +92,14 @@ const Game = () => {
     const diffY = touchStart.y - touchEnd.y;
 
     if (Math.abs(diffX) > Math.abs(diffY)) {
+      // Horizontal swipe
       if (diffX > 20) {
         moveLeft();
       } else if (diffX < -20) {
         moveRight();
       }
     } else {
+      // Vertical swipe
       if (diffY > 20) {
         moveUp();
       } else if (diffY < -20) {
