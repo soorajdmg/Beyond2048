@@ -1,548 +1,638 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const User = require('../models/user');
 
-axios.defaults.baseURL = 'https://beyond2048-backend.onrender.com';
+exports.signup = async (req, res) => {
+  console.log('Request body:', req.body);
+  try {
+    const { name, username, password } = req.body;
 
-const authAxios = axios.create({
-  baseURL: 'https://beyond2048-backend.onrender.com',
-});
-const AuthContext = createContext();
-
-export function useAuth() {
-  return useContext(AuthContext);
-}
-
-export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [authError, setAuthError] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userStats, setUserStats] = useState(null);
-  const [userSettings, setUserSettings] = useState(null);
-  const [recentGames, setRecentGames] = useState([]);
-
-  const setAxiosAuthHeader = (token) => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      authAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-      delete authAxios.defaults.headers.common['Authorization'];
-    }
-  };
-
-  useEffect(() => {
-    const requestInterceptor = authAxios.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    const responseInterceptor = authAxios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('token');
-          setCurrentUser(null);
-          setUserStats(null);
-          setUserSettings(null);
-          setRecentGames([]);
-          setIsAuthenticated(false);
-          setAxiosAuthHeader(null);
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      authAxios.interceptors.request.eject(requestInterceptor);
-      authAxios.interceptors.response.eject(responseInterceptor);
-    };
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const response = await authAxios.get('/api/auth/user');
-
-      if (response.data && response.data.success) {
-        if (response.data.user) {
-          setCurrentUser(response.data.user);
-        }
-
-        if (response.data.user && response.data.user.stats) {
-          setUserStats(response.data.user.stats);
-        }
-
-        if (response.data.user && response.data.user.settings) {
-          setUserSettings(response.data.user.settings);
-        }
-
-        if (response.data.user && response.data.user.recentGames) {
-          setRecentGames(response.data.user.recentGames);
-        }
-
-        return response.data.user;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const fetchUserStats = async () => {
-    try {
-      const response = await authAxios.get('/api/auth/stats');
-
-      if (response.data && response.data.success) {
-        setUserStats(response.data.data);
-        return response.data.data;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const fetchRecentGames = async () => {
-    try {
-      const response = await authAxios.get('/api/auth/stats');
-
-      if (response.data && response.data.success) {
-        setRecentGames(response.data.games);
-        return response.data.games;
-      } else {
-        return [];
-      }
-    } catch (error) {
-      return [];
-    }
-  };
-
-  const getUserSettings = async () => {
-    try {
-      const response = await authAxios.get('/api/auth/settings');
-
-      if (response.data && response.data.success) {
-        setUserSettings(response.data.settings);
-        return {
-          success: true,
-          settings: response.data.settings
-        };
-      } else {
-        return {
-          success: false,
-          message: response.data?.message || "Failed to fetch settings"
-        };
-      }
-    } catch (error) {
-      return {
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({
         success: false,
-        message: error.message || "Error fetching settings"
-      };
-    }
-  };
-
-  const updateUserSettings = async (settings) => {
-    try {
-      const response = await authAxios.post('/api/auth/settings', { settings });
-
-      if (response.data && response.data.success) {
-        setUserSettings(response.data.settings);
-        return {
-          success: true,
-          settings: response.data.settings
-        };
-      } else {
-        return {
-          success: false,
-          message: response.data?.message || "Failed to update settings"
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || "Error updating settings"
-      };
-    }
-  };
-
-  const resetUserSettings = async () => {
-    try {
-      const response = await authAxios.post('/api/auth/reset');
-
-      if (response.data && response.data.success) {
-        setUserSettings(response.data.settings);
-        return {
-          success: true,
-          settings: response.data.settings
-        };
-      } else {
-        return {
-          success: false,
-          message: response.data?.message || "Failed to reset settings"
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || "Error resetting settings"
-      };
-    }
-  };
-
-  const checkAuthStatus = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        setIsAuthenticated(false);
-        setCurrentUser(null);
-        setUserStats(null);
-        setUserSettings(null);
-        setRecentGames([]);
-        setAxiosAuthHeader(null);
-        setLoading(false);
-        return;
-      }
-
-      setAxiosAuthHeader(token);
-
-      const userData = await fetchUserData();
-
-      if (userData) {
-        setIsAuthenticated(true);
-
-        if (!userData.stats || !userData.recentGames) {
-          await Promise.all([
-            fetchUserStats(),
-            fetchRecentGames(),
-            getUserSettings()
-          ]);
-        }
-      } else {
-        localStorage.removeItem('token');
-        setCurrentUser(null);
-        setUserStats(null);
-        setUserSettings(null);
-        setRecentGames([]);
-        setIsAuthenticated(false);
-        setAxiosAuthHeader(null);
-      }
-    } catch (error) {
-      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        localStorage.removeItem('token');
-        setCurrentUser(null);
-        setUserStats(null);
-        setUserSettings(null);
-        setRecentGames([]);
-        setIsAuthenticated(false);
-        setAxiosAuthHeader(null);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const saveAuthData = async (userData, token) => {
-    if (!userData || !token) {
-      return { success: false, user: null, stats: null, settings: null, recentGames: [] };
-    }
-
-    try {
-      localStorage.setItem('token', token);
-
-      setAxiosAuthHeader(token);
-
-      setCurrentUser(userData);
-      setIsAuthenticated(true);
-
-      const [stats, settingsResponse, games] = await Promise.all([
-        fetchUserStats(),
-        getUserSettings(),
-        fetchRecentGames()
-      ]);
-
-      return {
-        success: true,
-        user: userData,
-        stats,
-        settings: settingsResponse?.settings,
-        recentGames: games
-      };
-    } catch (error) {
-      return {
-        success: false,
-        user: null,
-        stats: null,
-        settings: null,
-        recentGames: []
-      };
-    }
-  };
-
-  const login = async (username, password) => {
-    try {
-      setAuthError(null);
-      setLoading(true);
-
-      const response = await authAxios.post('/api/auth/login', {
-        username,
-        password
+        message: 'User with this username already exists'
       });
-
-      let token, userData;
-
-      if (response.data.data && response.data.data.token) {
-        token = response.data.data.token;
-        userData = response.data.data.user;
-      } else if (response.data.token) {
-        token = response.data.token;
-        userData = response.data.user;
-      } else {
-        throw new Error("Invalid login response format");
-      }
-
-      if (!token || !userData) {
-        throw new Error("Missing token or user data in login response");
-      }
-
-      const saved = await saveAuthData(userData, token);
-      if (!saved) {
-        throw new Error("Failed to save authentication data");
-      }
-
-      return {
-        ...userData,
-        stats: userStats,
-        settings: userSettings,
-        recentGames: recentGames
-      };
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "Login failed. Please try again.";
-      setAuthError(errorMessage);
-      throw error;
-    } finally {
-      setLoading(false);
     }
-  };
 
-  const signup = async (name, username, password) => {
-    try {
-      setAuthError(null);
-      setLoading(true);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      const userData = {
-        name,
-        username,
-        password,
-      };
+    const user = new User({
+      name,
+      username,
+      password: hashedPassword
+    });
 
-      const response = await authAxios.post('/api/auth/signup', userData);
+    console.log('Password before saving:', user.password);
+    await user.save();
 
-      let token, user;
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
 
-      if (response.data && response.data.token) {
-        token = response.data.token;
-        user = response.data.user;
-      } else if (response.data.token) {
-        token = response.data.token;
-        user = response.data.user;
-      } else {
-        throw new Error("Invalid signup response format");
+    const stats = {
+      gamesPlayed: 0,
+      highScore: 0,
+      totalScore: 0,
+      averageScore: 0,
+      winRate: 0
+    };
+
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        stats: stats
       }
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during registration',
+      error: error.message
+    });
+  }
+};
 
-      await saveAuthData(user, token);
+exports.login = async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-      return {
-        ...userData,
-        stats: userStats,
-        settings: userSettings,
-        recentGames: recentGames
-      };
-    } catch (error) {
-      setAuthError(error.response?.data?.message || "Registration failed");
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const logout = () => {
-    try {
-      localStorage.removeItem('token');
-      const logOutScore = 0;
-      localStorage.setItem('2048HighScore', logOutScore.toString());
-
-      setAxiosAuthHeader(null);
-
-      setCurrentUser(null);
-      setUserStats(null);
-      setUserSettings(null);
-      setRecentGames([]);
-      setIsAuthenticated(false);
-
-      const response = { success: "true", message: "Logout successful" }
-
-      return {
-        ...response
-      };
-    } catch (error) {
-    }
-  };
-
-  const saveGameStats = async (gameStats) => {
-    try {
-      if (!isAuthenticated || !currentUser) {
-        return false;
-      }
-
-      const response = await authAxios.post('/api/auth/stats/game', gameStats);
-
-      if (response.data && response.data.success) {
-        if (response.data.data && response.data.data.stats) {
-          setUserStats(response.data.data.stats);
-        }
-
-        await Promise.all([
-          fetchUserStats(),
-          fetchRecentGames()
-        ]);
-
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const updateProfile = async (userData) => {
-    try {
-      setLoading(true);
-      setAuthError(null);
-
-      const response = await authAxios.put('/api/user/profile', userData);
-
-      if (response.data && response.data.user) {
-        setCurrentUser(response.data.user);
-
-        await Promise.all([
-          fetchUserStats(),
-          fetchRecentGames()
-        ]);
-
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      setAuthError(error.response?.data?.message || "Failed to update profile");
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const refreshUserData = async () => {
-    try {
-      setLoading(true);
-      setAuthError(null);
-
-      const [profileResponse, statsResponse, settingsResponse, gamesResponse] = await Promise.all([
-        authAxios.get('/api/user/profile'),
-        fetchUserStats(),
-        getUserSettings(),
-        fetchRecentGames()
-      ]);
-
-      if (profileResponse.data && profileResponse.data.user) {
-        setCurrentUser(profileResponse.data.user);
-        return {
-          user: profileResponse.data.user,
-          stats: statsResponse,
-          settings: settingsResponse?.settings,
-          recentGames: gamesResponse
-        };
-      }
-
-      return false;
-    } catch (error) {
-      setAuthError(error.response?.data?.message || "Failed to load profile data");
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchLeaderboard = async () => {
-    try {
-      const response = await axios.get('/api/auth/leaderboard');
-
-      if (response.data && response.data.success) {
-        return {
-          success: true,
-          leaderboard: response.data.data
-        };
-      } else {
-        return {
-          success: false,
-          message: response.data?.message || "Failed to fetch leaderboard",
-          leaderboard: []
-        };
-      }
-    } catch (error) {
-      return {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({
         success: false,
-        message: error.message || "Error fetching leaderboard",
-        leaderboard: []
-      };
+        message: 'Invalid username or password'
+      });
     }
-  };
 
-  const value = {
-    currentUser,
-    userStats,
-    userSettings,
-    recentGames,
-    isAuthenticated,
-    login,
-    signup,
-    logout,
-    authError,
-    loading,
-    saveGameStats,
-    updateProfile,
-    refreshUserData,
-    fetchUserData,
-    fetchUserStats,
-    fetchRecentGames,
-    getUserSettings,
-    updateUserSettings,
-    resetUserSettings,
-    fetchLeaderboard,
-    authAxios,
-    checkAuthStatus,
-    setError: setAuthError
-  };
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid username or password'
+      });
+    }
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
 
-export default AuthContext;
+    const stats = user.stats || {
+      gamesPlayed: 0,
+      highScore: 0,
+      totalScore: 0,
+      averageScore: 0,
+      winRate: 0
+    };
+
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        stats: stats
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during login',
+      error: error.message
+    });
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during logout',
+      error: error.message
+    });
+  }
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const stats = {
+      gamesPlayed: user.gamesPlayed || 0,
+      bestScore: user.bestScore || 0,
+      highestTile: user.highestTile || 0,
+      totalWins: user.totalWins || 0,
+      winRate: user.gamesPlayed > 0 ? (user.totalWins / user.gamesPlayed * 100).toFixed(1) : 0,
+      averageScore: user.averageScore || 0,
+      totalScore: user.totalScore || 0,
+      totalMoves: user.totalMoves || 0,
+      minutesPlayed: user.minutesPlayed || 0
+    };
+
+    const recentGames = user.gameHistory ?
+      user.gameHistory
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5)
+      : [];
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        settings: user.settings,
+        stats: stats,
+        recentGames: recentGames
+      }
+    });
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching user data',
+      error: error.message
+    });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, username, stats } = req.body;
+
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (username) updateData.username = username;
+
+    if (req.body.password) {
+      updateData.password = req.body.password;
+    }
+
+    if (stats) {
+      updateData.stats = stats;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        stats: user.stats || {
+          gamesPlayed: 0,
+          highScore: 0,
+          totalScore: 0,
+          averageScore: 0,
+          winRate: 0
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating profile',
+      error: error.message
+    });
+  }
+};
+
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+      .select('-password -__v');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User profile not found'
+      });
+    }
+
+    const stats = user.stats || {
+      gamesPlayed: 0,
+      highScore: 0,
+      totalScore: 0,
+      averageScore: 0,
+      winRate: 0
+    };
+
+    res.status(200).json({
+      success: true,
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          username: user.username
+        },
+        stats: stats
+      }
+    });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching profile data',
+      error: error.message
+    });
+  }
+};
+
+exports.getStats = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const stats = {
+      bestScore: user.bestScore || 0,
+      highestTile: user.highestTile || 0,
+      totalScore: user.totalScore || 0,
+      gamesPlayed: user.gamesPlayed || 0,
+      totalWins: user.totalWins || 0,
+      totalMoves: user.totalMoves || 0,
+      averageScore: user.averageScore || 0,
+      minutesPlayed: user.minutesPlayed || 0
+    };
+
+    res.status(200).json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Get stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching user stats',
+      error: error.message
+    });
+  }
+};
+
+exports.saveGameStats = async (req, res) => {
+  try {
+    console.log("Request from frontend: ", req)
+    const userId = req.user.id;
+    const { score, highestTile, moves, result, won, timePlayed, date } = req.body;
+
+    if (score === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Game score is required'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    user.bestScore = user.bestScore || 0;
+    user.highestTile = user.highestTile || 0;
+    user.gamesPlayed = user.gamesPlayed || 0;
+    user.totalWins = user.totalWins || 0;
+    user.totalMoves = user.totalMoves || 0;
+    user.totalScore = user.totalScore || 0;
+    user.averageScore = user.averageScore || 0;
+    user.minutesPlayed = user.minutesPlayed || 0;
+
+    user.gamesPlayed += 1;
+    user.totalScore += score;
+    user.totalMoves += moves;
+    user.minutesPlayed += timePlayed / 60;
+
+    if (score > user.bestScore) {
+      user.bestScore = score;
+    }
+
+    if (highestTile > user.highestTile) {
+      user.highestTile = highestTile;
+    }
+
+    if (won) {
+      user.totalWins = (user.totalWins || 0) + 1;
+    }
+
+    user.averageScore = user.gamesPlayed > 0 ? (Math.round(user.totalScore / user.gamesPlayed)) : 0;
+
+    const gameRecord = {
+      date: new Date(date) || new Date(),
+      score,
+      highestTile,
+      moves,
+      result: result?.toUpperCase(),
+      won,
+      timePlayed: timePlayed / 60,
+      completed: "true"
+    };
+    user.gameHistory.push(gameRecord);
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Game stats saved successfully',
+      data: {
+        game: {
+          score,
+          highestTile,
+          moves,
+          result,
+          won,
+          timePlayed,
+          date
+        },
+        stats: user
+      }
+    });
+  } catch (error) {
+    console.error('Save game stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while saving game stats',
+      error: error.message
+    });
+  }
+};
+
+exports.getLeaderboard = async (req, res) => {
+  try {
+    const leaderboard = await User.find({})
+      .sort({ bestScore: -1 })
+      .limit(10)
+      .select('username bestScore gamesPlayed totalWins highestTile');
+
+    if (!leaderboard) {
+      return res.status(404).json({
+        success: false,
+        message: 'No users found for leaderboard'
+      });
+    }
+
+    const formattedLeaderboard = leaderboard.map((user, index) => ({
+      rank: index + 1,
+      username: user.username,
+      highScore: user.bestScore || 0,
+      gamesPlayed: user.gamesPlayed || 0,
+      totalWins: user.totalWins || 0,
+      highestTile: user.highestTile || 0
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedLeaderboard
+    });
+  } catch (error) {
+    console.error('Get leaderboard error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching leaderboard data',
+      error: error.message
+    });
+  }
+};
+
+exports.getMostWinsLeaderboard = async (req, res) => {
+  try {
+    const leaderboard = await User.find({ totalWins: { $gt: 0 } })
+      .sort({ totalWins: -1 })
+      .limit(10)
+      .select('username totalWins gamesPlayed bestScore highestTile');
+
+    if (!leaderboard || leaderboard.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No users found with wins for leaderboard'
+      });
+    }
+
+    const formattedLeaderboard = leaderboard.map((user, index) => ({
+      rank: index + 1,
+      username: user.username,
+      totalWins: user.totalWins || 0,
+      gamesPlayed: user.gamesPlayed || 0,
+      winRate: user.gamesPlayed > 0 ? ((user.totalWins / user.gamesPlayed) * 100).toFixed(1) : "0.0",
+      bestScore: user.bestScore || 0,
+      highestTile: user.highestTile || 0
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedLeaderboard
+    });
+  } catch (error) {
+    console.error('Get most wins leaderboard error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching most wins leaderboard data',
+      error: error.message
+    });
+  }
+};
+
+exports.getHighestTilesLeaderboard = async (req, res) => {
+  try {
+    const leaderboard = await User.find({ highestTile: { $gt: 0 } })
+      .sort({ highestTile: -1 })
+      .limit(10)
+      .select('username highestTile bestScore gamesPlayed totalWins');
+
+    if (!leaderboard || leaderboard.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No users found with tiles for leaderboard'
+      });
+    }
+
+    const formattedLeaderboard = leaderboard.map((user, index) => ({
+      rank: index + 1,
+      username: user.username,
+      highestTile: user.highestTile || 0,
+      bestScore: user.bestScore || 0,
+      gamesPlayed: user.gamesPlayed || 0,
+      totalWins: user.totalWins || 0
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedLeaderboard
+    });
+  } catch (error) {
+    console.error('Get highest tiles leaderboard error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching highest tiles leaderboard data',
+      error: error.message
+    });
+  }
+};
+
+exports.getUserSettings = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId).select('settings');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const settings = user.settings || {
+      theme: 'classic',
+      gameSize: 4,
+      soundEffects: false,
+      animations: true
+    };
+
+    res.status(200).json({
+      success: true,
+      settings
+    });
+  } catch (error) {
+    console.error('Get settings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching user settings',
+      error: error.message
+    });
+  }
+};
+
+exports.updateUserSettings = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { settings } = req.body;
+
+    if (!settings) {
+      return res.status(400).json({
+        success: false,
+        message: 'Settings object is required'
+      });
+    }
+
+    const validatedSettings = {
+      theme: settings.theme || 'classic',
+      gameSize: settings.gameSize || 4,
+      soundEffects: settings.soundEffects !== undefined ? settings.soundEffects : false,
+      animations: settings.animations !== undefined ? settings.animations : true
+    };
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { settings: validatedSettings },
+      { new: true }
+    ).select('settings');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Settings updated successfully',
+      settings: user.settings
+    });
+  } catch (error) {
+    console.error('Update settings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating user settings',
+      error: error.message
+    });
+  }
+};
+
+exports.resetUserSettings = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const defaultSettings = {
+      theme: 'classic',
+      gameSize: 4,
+      soundEffects: false,
+      animations: true
+    };
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { settings: defaultSettings },
+      { new: true }
+    ).select('settings');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Settings reset to default',
+      settings: user.settings
+    });
+  } catch (error) {
+    console.error('Reset settings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while resetting user settings',
+      error: error.message
+    });
+  }
+};
+
+module.exports = exports;

@@ -13,7 +13,9 @@ const {
   getUserSettings,
   updateUserSettings,
   resetUserSettings,
-  getLeaderboard 
+  getLeaderboard,
+  getMostWinsLeaderboard,
+  getHighestTilesLeaderboard
 } = require('../controllers/authController');
 const { authMiddleware } = require('../middleware/authMiddleware');
 
@@ -30,6 +32,8 @@ router.get('/stats', authMiddleware, getStats);
 router.post('/stats/game', authMiddleware, saveGameStats);
 
 router.get('/leaderboard', getLeaderboard);
+router.get('/leaderboard/wins', getMostWinsLeaderboard);
+router.get('/leaderboard/tiles', getHighestTilesLeaderboard);
 
 router.get('/settings', authMiddleware, getUserSettings);
 router.post('/settings', authMiddleware, updateUserSettings);
