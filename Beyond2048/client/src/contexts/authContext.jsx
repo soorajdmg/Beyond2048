@@ -1,10 +1,10 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://beyond2048-backend.onrender.com/';
+axios.defaults.baseURL = 'http://beyond2048-backend.onrender.com';
 
 const authAxios = axios.create({
-  baseURL: 'http://beyond2048-backend.onrender.com/',
+  baseURL: 'http://beyond2048-backend.onrender.com',
 });
 const AuthContext = createContext();
 
