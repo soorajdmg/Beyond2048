@@ -1,4 +1,5 @@
 :root {
+  /* Classic theme */
   --classic-grid-cell-bg: #cdc1b4;
   --classic-text: #776e65;
   --classic-tile-2: #eee4da;
@@ -12,7 +13,11 @@
   --classic-tile-512: #edc850;
   --classic-tile-1024: #edc53f;
   --classic-tile-2048: #edc22e;
+  --classic-tile-4096: #ebb408;
+  --classic-tile-8192: #e69708;
+  --classic-tile-16384: #e07e00;
 
+  /* Dark theme */
   --dark-grid-cell-bg: #2d3748;
   --dark-text: #e2e8f0;
   --dark-tile-2: #4a5568;
@@ -26,6 +31,9 @@
   --dark-tile-512: #9c4221;
   --dark-tile-1024: #7b341e;
   --dark-tile-2048: #652b19;
+  --dark-tile-4096: #543214;
+  --dark-tile-8192: #42280f;
+  --dark-tile-16384: #30200a;
 
   --neon-grid-cell-bg: #0f172a;
   --neon-tile-2: #00ffff;
@@ -39,7 +47,11 @@
   --neon-tile-512: #ff8700;
   --neon-tile-1024: #daff00;
   --neon-tile-2048: #ffff00;
+  --neon-tile-4096: #ff9500;
+  --neon-tile-8192: #ff1e00;
+  --neon-tile-16384: #bd00ff;
 
+  /* Childish theme*/
   --childish-grid-cell-bg: #fef3c7;
   --childish-text: #92400e;
   --childish-tile-2: #fef9c3;
@@ -53,6 +65,9 @@
   --childish-tile-512: #62d0ff;
   --childish-tile-1024: #c4b5fd;
   --childish-tile-2048: #a78bfa;
+  --childish-tile-4096: #8b5cf6;
+  --childish-tile-8192: #7c3aed;
+  --childish-tile-16384: #6d28d9;
 }
 
 .game-tile {
@@ -211,13 +226,19 @@
 }
 
 .tile-4096 {
-  background-color: #3c3a32;
+  background-color: var(--classic-tile-4096);
   color: #ffffff;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .tile-8192 {
-  background-color: #2d2d2d;
+  background-color: var(--classic-tile-8192);
+  color: #ffffff;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.tile-16384 {
+  background-color: var(--classic-tile-16384);
   color: #ffffff;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -289,13 +310,19 @@
 }
 
 .dark-theme .tile-4096 {
-  background-color: #1a202c;
+  background-color: var(--dark-tile-4096);
   color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .dark-theme .tile-8192 {
-  background-color: #171923;
+  background-color: var(--dark-tile-8192);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .tile-16384 {
+  background-color: var(--dark-tile-16384);
   color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -367,15 +394,21 @@
 }
 
 .neon-theme .tile-4096 {
-  background-color: #ff00ff;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(255, 0, 255, 0.8);
+  background-color: var(--neon-tile-4096);
+  color: #000000;
+  box-shadow: 0 0 14px rgba(255, 149, 0, 0.7);
 }
 
 .neon-theme .tile-8192 {
-  background-color: #ff00cc;
+  background-color: var(--neon-tile-8192);
   color: #ffffff;
-  box-shadow: 0 0 16px rgba(255, 0, 204, 0.8);
+  box-shadow: 0 0 14px rgba(255, 30, 0, 0.7);
+}
+
+.neon-theme .tile-16384 {
+  background-color: var(--neon-tile-16384);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(189, 0, 255, 0.8);
 }
 
 .childish-theme .game-tile {
@@ -449,15 +482,21 @@
 }
 
 .childish-theme .tile-4096 {
-  background-color: #dbd7fc;
-  color: #4c1d95;
+  background-color: var(--childish-tile-4096);
+  color: #ffffff;
   box-shadow: 0 3px 0 rgba(109, 40, 217, 0.4);
 }
 
 .childish-theme .tile-8192 {
-  background-color: #f0abfc;
-  color: #701a75;
-  box-shadow: 0 3px 0 rgba(192, 38, 211, 0.4);
+  background-color: var(--childish-tile-8192);
+  color: #ffffff;
+  box-shadow: 0 3px 0 rgba(95, 30, 186, 0.4);
+}
+
+.childish-theme .tile-16384 {
+  background-color: var(--childish-tile-16384);
+  color: #ffffff;
+  box-shadow: 0 3px 0 rgba(79, 20, 156, 0.4);
 }
 
 .tile-new {
@@ -653,7 +692,6 @@
   }
 }
 
-
 .tile-merged {
   animation: smooth-tile-merged 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.5) forwards;
   z-index: 20;
@@ -680,6 +718,8 @@
   }
 }
 
+
+/* Dark Theme */
 .dark-theme .tile-merged {
   animation: dark-smooth-tile-merged 0.35s cubic-bezier(0.25, 0.1, 0.25, 1.4) forwards;
 }
@@ -710,6 +750,7 @@
   }
 }
 
+/* Neon Theme */
 .neon-theme .tile-merged {
   animation: neon-smooth-tile-merged 0.4s cubic-bezier(0.2, 0.8, 0.2, 1.2) forwards;
 }
@@ -740,6 +781,7 @@
   }
 }
 
+/* Childish Theme */
 .childish-theme .tile-merged {
   animation: childish-smooth-tile-merged 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
@@ -801,6 +843,7 @@
   background: white;
   animation: neon-merge-flash 0.3s ease-out forwards;
 }
+
 
 @keyframes neon-merge-flash {
   0% {
