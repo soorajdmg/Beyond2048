@@ -27,12 +27,14 @@
     transform: scale(0.9);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
   }
 }
 
+/* Default Theme */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -98,14 +100,14 @@
   flex-direction: column;
 }
 
-.timeframe-selector {
+.category-selector {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
 
-.timeframe-btn {
+.category-btn {
   padding: 0.5rem 1rem;
   border: none;
   background-color: #eee4da;
@@ -117,11 +119,11 @@
   font-size: 0.9rem;
 }
 
-.timeframe-btn:hover {
+.category-btn:hover {
   background-color: #ede0c8;
 }
 
-.timeframe-btn.active {
+.category-btn.active {
   background-color: #8f7a66;
   color: white;
 }
@@ -159,7 +161,11 @@
   min-width: 180px;
 }
 
-.score-col, .games-col {
+.score-col,
+.tile-col,
+.wins-col,
+.games-col,
+.winrate-col {
   width: 100px;
   text-align-last: right;
 }
@@ -228,9 +234,13 @@
   color: #776e65;
 }
 
-.score-cell, .games-cell {
+.score-cell,
+.tile-cell,
+.wins-cell,
+.games-cell,
+.winrate-cell {
   font-weight: 600;
-  color: #776e65;
+  color: #92400e;
   text-align: right;
 }
 
@@ -260,6 +270,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -318,6 +329,7 @@
   background-color: #776e65;
 }
 
+/* ======= DARK THEME ======= */
 .leaderboard-modal.dark {
   background-color: #1a202c;
   color: #f7fafc;
@@ -348,16 +360,16 @@
   color: #f7fafc;
 }
 
-.leaderboard-modal.dark .timeframe-btn {
+.leaderboard-modal.dark .category-btn {
   background-color: #2d3748;
   color: #e2e8f0;
 }
 
-.leaderboard-modal.dark .timeframe-btn:hover {
+.leaderboard-modal.dark .category-btn:hover {
   background-color: #4a5568;
 }
 
-.leaderboard-modal.dark .timeframe-btn.active {
+.leaderboard-modal.dark .category-btn.active {
   background-color: #a0aec0;
   color: #1a202c;
 }
@@ -384,7 +396,10 @@
 }
 
 .leaderboard-modal.dark .score-cell,
-.leaderboard-modal.dark .games-cell {
+.leaderboard-modal.dark .games-cell,
+.leaderboard-modal.dark .tile-cell,
+.leaderboard-modal.dark .wins-cell,
+.leaderboard-modal.dark .winrate-cell {
   color: #e2e8f0;
 }
 
@@ -428,6 +443,7 @@
   background-color: #2d3748;
 }
 
+/* ======= NEON THEME ======= */
 .leaderboard-modal.neon {
   background-color: #0f172a;
   color: #e2e8f0;
@@ -461,18 +477,18 @@
   text-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
 }
 
-.leaderboard-modal.neon .timeframe-btn {
+.leaderboard-modal.neon .category-btn {
   background-color: #1e293b;
   color: #60a5fa;
   box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
 }
 
-.leaderboard-modal.neon .timeframe-btn:hover {
+.leaderboard-modal.neon .category-btn:hover {
   background-color: #0f172a;
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
 }
 
-.leaderboard-modal.neon .timeframe-btn.active {
+.leaderboard-modal.neon .category-btn.active {
   background-color: #3b82f6;
   color: #0f172a;
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.7);
@@ -519,7 +535,10 @@
 }
 
 .leaderboard-modal.neon .score-cell,
-.leaderboard-modal.neon .games-cell {
+.leaderboard-modal.neon .games-cell,
+.leaderboard-modal.neon .tile-cell,
+.leaderboard-modal.neon .wins-cell,
+.leaderboard-modal.neon .winrate-cell {
   color: #10b981;
   text-shadow: 0 0 2px rgba(16, 185, 129, 0.5);
 }
@@ -571,12 +590,13 @@
   box-shadow: 0 0 12px rgba(37, 99, 235, 0.7);
 }
 
+/* ======= CHILDISH THEME ======= */
 .leaderboard-modal.childish {
   background-color: #fffbeb;
   color: #92400e;
   border-radius: 1rem;
   box-shadow: 0 8px 0 rgba(251, 146, 60, 0.2);
-  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .modal-header {
@@ -587,7 +607,7 @@
 
 .leaderboard-modal.childish .modal-header h2 {
   color: #92400e;
-  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .refresh-btn {
@@ -606,19 +626,19 @@
   background-color: rgba(146, 64, 14, 0.1);
 }
 
-.leaderboard-modal.childish .timeframe-btn {
+.leaderboard-modal.childish .category-btn {
   background-color: #fef2f2;
   color: #92400e;
   border-radius: 1rem;
   box-shadow: 0 3px 0 rgba(251, 146, 60, 0.3);
-  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
-.leaderboard-modal.childish .timeframe-btn:hover {
+.leaderboard-modal.childish .category-btn:hover {
   background-color: #fee2e2;
 }
 
-.leaderboard-modal.childish .timeframe-btn.active {
+.leaderboard-modal.childish .category-btn.active {
   background-color: #f59e0b;
   color: white;
   box-shadow: 0 3px 0 rgba(245, 158, 11, 0.5);
@@ -627,7 +647,7 @@
 .leaderboard-modal.childish .leaderboard-table thead th {
   color: #92400e;
   border-bottom: 2px solid #fde68a;
-  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .leaderboard-table tbody td {
@@ -689,7 +709,7 @@
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 rgba(245, 158, 11, 0.5);
-  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .retry-btn:hover {
@@ -709,7 +729,7 @@
   color: white;
   border-radius: 1rem;
   box-shadow: 0 3px 0 rgba(245, 158, 11, 0.5);
-  font-family: Comic Neue, Comic Sans MS, cursive, sans-serif;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
 .leaderboard-modal.childish .view-all-btn:hover {
@@ -717,29 +737,29 @@
 }
 
 @media (max-width: 640px) {
-  .timeframe-selector {
+  .category-selector {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
-  .timeframe-btn {
+
+  .category-btn {
     width: 100%;
   }
-  
+
   .leaderboard-footer {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
   }
-  
+
   .view-all-btn {
     width: 100%;
   }
-  
+
   .player-info {
     gap: 0.5rem;
   }
-  
+
   .leaderboard-table thead th,
   .leaderboard-table tbody td {
     padding: 0.5rem;
@@ -750,27 +770,27 @@
   .leaderboard-modal {
     width: 95%;
   }
-  
+
   .rank-col,
   .score-col,
   .games-col {
     width: auto;
   }
-  
+
   .player-col {
     min-width: 120px;
   }
-  
+
   .avatar-placeholder {
     width: 24px;
     height: 24px;
     font-size: 0.7rem;
   }
-  
+
   .username {
     font-size: 0.9rem;
   }
-  
+
   .score-cell,
   .games-cell {
     font-size: 0.9rem;

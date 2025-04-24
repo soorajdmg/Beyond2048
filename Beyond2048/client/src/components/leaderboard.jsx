@@ -1,48 +1,64 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, RefreshCw } from 'lucide-react';
 import { useSettings } from '../contexts/settingsContext';
-import { useAuth } from '../contexts/authContext'; 
+import { useAuth } from '../contexts/authContext';
 import './leaderboard.css';
 
 const LeaderboardModal = ({
   onClose,
 }) => {
   const { gameSettings } = useSettings();
-  const { fetchLeaderboard } = useAuth();
-  
+  const {
+    fetchLeaderboard,
+    fetchMostWinsLeaderboard,
+    fetchHighestTilesLeaderboard
+  } = useAuth();
+
   const currentTheme = gameSettings?.theme || 'classic';
   const isDarkTheme = currentTheme === 'dark' || currentTheme === 'neon';
 
+  // Local states
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [leaderboardData, setLeaderboardData] = useState([]);
-  const [timeframe, setTimeframe] = useState('alltime');
+  const [category, setCategory] = useState('highScore');
 
   const modalRef = useRef(null);
 
   useEffect(() => {
     fetchLeaderboardData();
-  }, [timeframe]);
+  }, [category]);
 
   const fetchLeaderboardData = async () => {
     setIsLoading(true);
     try {
-      const result = await fetchLeaderboard();
+      let result;
       
-      if (result.success) {
+      if (category === 'highScore') {
+        result = await fetchLeaderboard();
+      } else if (category === 'totalWins') {
+        result = await fetchMostWinsLeaderboard();
+      } else if (category === 'highestTile') {
+        result = await fetchHighestTilesLeaderboard();
+      }
+
+      if (result && result.success) {
         const formattedData = result.leaderboard.map(player => ({
-          id: player.rank, 
+          id: player.rank,
           username: player.username,
-          score: player.highScore,
+          score: player.highScore || player.bestScore || 0,
           position: player.rank,
           games: player.gamesPlayed,
-          avatar: player.username.substring(0, 2).toUpperCase() 
+          wins: player.totalWins,
+          highestTile: player.highestTile,
+          winRate: player.winRate,
+          avatar: player.username.substring(0, 2).toUpperCase()
         }));
-        
+
         setLeaderboardData(formattedData);
         setError(null);
       } else {
-        setError(result.message || 'Failed to load leaderboard data');
+        setError(result?.message || 'Failed to load leaderboard data');
         setLeaderboardData([]);
       }
     } catch (err) {
@@ -53,8 +69,8 @@ const LeaderboardModal = ({
     }
   };
 
-  const handleTimeframeChange = (newTimeframe) => {
-    setTimeframe(newTimeframe);
+  const handleCategoryChange = (newCategory) => {
+    setCategory(newCategory);
   };
 
   useEffect(() => {
@@ -69,6 +85,42 @@ const LeaderboardModal = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [onClose]);
+
+  const renderValueColumn = () => {
+    if (category === 'highScore') {
+      return <th className="score-col">Score</th>;
+    } else if (category === 'totalWins') {
+      return <th className="wins-col">Wins</th>;
+    } else if (category === 'highestTile') {
+      return <th className="tile-col">Tile</th>;
+    }
+  };
+
+  const renderSecondaryColumn = () => {
+    if (category === 'totalWins') {
+      return <th className="winrate-col">Win Rate</th>;
+    } else {
+      return <th className="games-col">Games</th>;
+    }
+  };
+
+  const renderValueCell = (player) => {
+    if (category === 'highScore') {
+      return <td className="score-cell">{player.score.toLocaleString()}</td>;
+    } else if (category === 'totalWins') {
+      return <td className="wins-cell">{player.wins.toLocaleString()}</td>;
+    } else if (category === 'highestTile') {
+      return <td className="tile-cell">{player.highestTile.toLocaleString()}</td>;
+    }
+  };
+
+  const renderSecondaryCell = (player) => {
+    if (category === 'totalWins') {
+      return <td className="winrate-cell">{player.winRate}%</td>;
+    } else {
+      return <td className="games-cell">{player.games}</td>;
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={(e) => {
@@ -100,24 +152,24 @@ const LeaderboardModal = ({
         </div>
 
         <div className="modal-content leaderboard-content">
-          <div className="timeframe-selector">
+          <div className="category-selector">
             <button
-              className={`timeframe-btn ${timeframe === 'daily' ? 'active' : ''}`}
-              onClick={() => handleTimeframeChange('daily')}
+              className={`category-btn ${category === 'highScore' ? 'active' : ''}`}
+              onClick={() => handleCategoryChange('highScore')}
             >
-              Daily
+              High Score
             </button>
             <button
-              className={`timeframe-btn ${timeframe === 'weekly' ? 'active' : ''}`}
-              onClick={() => handleTimeframeChange('weekly')}
+              className={`category-btn ${category === 'highestTile' ? 'active' : ''}`}
+              onClick={() => handleCategoryChange('highestTile')}
             >
-              Weekly
+              Highest Tile
             </button>
             <button
-              className={`timeframe-btn ${timeframe === 'alltime' ? 'active' : ''}`}
-              onClick={() => handleTimeframeChange('alltime')}
+              className={`category-btn ${category === 'totalWins' ? 'active' : ''}`}
+              onClick={() => handleCategoryChange('totalWins')}
             >
-              All Time
+              Total Wins
             </button>
           </div>
 
@@ -142,8 +194,8 @@ const LeaderboardModal = ({
                   <tr>
                     <th className="rank-col">Rank</th>
                     <th className="player-col">Player</th>
-                    <th className="score-col">Score</th>
-                    <th className="games-col">Games</th>
+                    {renderValueColumn()}
+                    {renderSecondaryColumn()}
                   </tr>
                 </thead>
                 <tbody>
@@ -164,8 +216,8 @@ const LeaderboardModal = ({
                           </div>
                         </div>
                       </td>
-                      <td className="score-cell">{player.score.toLocaleString()}</td>
-                      <td className="games-cell">{player.games}</td>
+                      {renderValueCell(player)}
+                      {renderSecondaryCell(player)}
                     </tr>
                   ))}
                 </tbody>
@@ -174,7 +226,7 @@ const LeaderboardModal = ({
           )}
 
           <div className="leaderboard-footer">
-            <p>Top players for {timeframe === 'daily' ? 'today' : timeframe === 'weekly' ? 'this week' : 'all time'}</p>
+            <p>Top players with the {category === 'highScore' ? 'Highest Scores' : category === 'highestTile' ? 'Highest Tiles' : 'Most Wins'}</p>
             <button className="view-all-btn">View Full Rankings</button>
           </div>
         </div>
@@ -183,4 +235,4 @@ const LeaderboardModal = ({
   );
 };
 
-export default LeaderboardModal;
+export default LeaderboardModal
