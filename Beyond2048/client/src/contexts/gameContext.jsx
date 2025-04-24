@@ -2,7 +2,9 @@ import React, { createContext, useState, useEffect, useContext, useCallback } fr
 import { useAuth } from './authContext';
 
 export const GameContext = createContext();
+
 export const useGameContext = () => useContext(GameContext);
+
 export const GameProvider = ({ children }) => {
   const { saveGameStats, isAuthenticated } = useAuth();
 
@@ -13,6 +15,7 @@ export const GameProvider = ({ children }) => {
   const [won, setWon] = useState(false);
   const [history, setHistory] = useState([]);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [gameMoves, setGameMoves] = useState(0);
 
   const [tilePositions, setTilePositions] = useState({});
   const [mergedTiles, setMergedTiles] = useState({});
@@ -35,9 +38,6 @@ export const GameProvider = ({ children }) => {
     soundEffects: true,
     animations: true
   });
-
-
-
 
   const [gameStartTime, setGameStartTime] = useState(null);
 
@@ -100,13 +100,12 @@ export const GameProvider = ({ children }) => {
       const gameData = {
         score: score,
         highestTile: getHighestTile(board),
-        moves: playerStats.totalMoves,
+        moves: gameMoves,
         result: gameResult,
         won: gameResult.toLowerCase() === 'win',
         timePlayed: timePlayed,
         date: new Date().toISOString(),
       };
-
 
       console.log("Saving game stats to database:", gameData);
       saveGameStats(gameData);
@@ -136,6 +135,7 @@ export const GameProvider = ({ children }) => {
     setTilePositions({});
     setMergedTiles({});
     setNewTiles({});
+    setGameMoves(0);
 
     startGameTimer();
 
@@ -157,7 +157,6 @@ export const GameProvider = ({ children }) => {
   const addRandomTile = (board) => {
     const emptyTiles = [];
 
-    // Find all empty positions
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] === 0) {
@@ -205,6 +204,10 @@ export const GameProvider = ({ children }) => {
       setHistory(prev => prev.slice(0, -1));
       setGameOver(false);
       setNewTiles({});
+
+      if (gameMoves > 0) {
+        setGameMoves(prev => prev - 1);
+      }
     }
   };
 
@@ -224,12 +227,15 @@ export const GameProvider = ({ children }) => {
     console.log("Checking for game over...");
     console.log("Current Board State:", JSON.stringify(board));
 
+    let hasWon = false;
+    let gameWon = won;
+
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] === 2048) {
-          console.log(`2048 tile found at position [${i}][${j}]. Game is won!`);
+          console.log(`2048 tile found at position [${i}][${j}]. Game is won but continues!`);
 
-          if (!gameOver) {
+          if (!gameWon) {
             const newGame = {
               date: new Date().toLocaleDateString(),
               result: 'win',
@@ -243,14 +249,17 @@ export const GameProvider = ({ children }) => {
 
             console.log("Updating player winning streak...");
             updatePlayerStats({
-              winningStreak: playerStats.winningStreak + 1 || 1
+              winningStreak: playerStats.winningStreak + 1 || 1,
+              totalMoves: playerStats.totalMoves + gameMoves
             });
 
             console.log("Saving game stats to database as a win...");
             saveGameStatsToDatabase('win');
+
+            gameWon = true;
           }
 
-          return true;
+          hasWon = true;
         }
       }
     }
@@ -287,7 +296,7 @@ export const GameProvider = ({ children }) => {
 
       const newGame = {
         date: new Date().toLocaleDateString(),
-        result: 'loss',
+        result: hasWon ? 'win' : 'loss',
         score: score,
         highestTile: getHighestTile(board)
       };
@@ -296,13 +305,13 @@ export const GameProvider = ({ children }) => {
       addRecentGame(newGame);
       updateTimePlayedStat();
 
-      console.log("Resetting player winning streak...");
       updatePlayerStats({
-        winningStreak: 0
+        winningStreak: hasWon ? playerStats.winningStreak : 0,
+        totalMoves: playerStats.totalMoves + gameMoves
       });
 
-      console.log("Saving game stats to database as a loss...");
-      saveGameStatsToDatabase('loss');
+      console.log("Saving game stats to database as a " + (hasWon ? 'win' : 'loss') + "...");
+      saveGameStatsToDatabase(hasWon ? 'win' : 'loss');
     } else {
       console.log("Game was already marked as over.");
     }
@@ -379,6 +388,7 @@ export const GameProvider = ({ children }) => {
 
             addRecentGame(newGame);
             updateTimePlayedStat();
+
             saveGameStatsToDatabase('win');
           }
         }
@@ -411,8 +421,9 @@ export const GameProvider = ({ children }) => {
     setMergedTiles(newMergedTiles);
 
     if (moved) {
+      setGameMoves(prev => prev + 1);
+
       updatePlayerStats({
-        totalMoves: playerStats.totalMoves + 1,
         highestTile: Math.max(playerStats.highestTile, newHighestTile)
       });
     }
@@ -491,6 +502,7 @@ export const GameProvider = ({ children }) => {
 
             addRecentGame(newGame);
             updateTimePlayedStat();
+
             saveGameStatsToDatabase('win');
           }
         }
@@ -526,8 +538,9 @@ export const GameProvider = ({ children }) => {
     setMergedTiles(newMergedTiles);
 
     if (moved) {
+      setGameMoves(prev => prev + 1);
+
       updatePlayerStats({
-        totalMoves: playerStats.totalMoves + 1,
         highestTile: Math.max(playerStats.highestTile, newHighestTile)
       });
     }
@@ -604,6 +617,7 @@ export const GameProvider = ({ children }) => {
 
             addRecentGame(newGame);
             updateTimePlayedStat();
+
             saveGameStatsToDatabase('win');
           }
         }
@@ -635,8 +649,9 @@ export const GameProvider = ({ children }) => {
     setMergedTiles(newMergedTiles);
 
     if (moved) {
+      setGameMoves(prev => prev + 1);
+
       updatePlayerStats({
-        totalMoves: playerStats.totalMoves + 1,
         highestTile: Math.max(playerStats.highestTile, newHighestTile)
       });
     }
@@ -715,6 +730,7 @@ export const GameProvider = ({ children }) => {
 
             addRecentGame(newGame);
             updateTimePlayedStat();
+
             saveGameStatsToDatabase('win');
           }
         }
@@ -749,10 +765,11 @@ export const GameProvider = ({ children }) => {
     setMergedTiles(newMergedTiles);
 
     if (moved) {
+      setGameMoves(prev => prev + 1);
       updatePlayerStats({
-        totalMoves: playerStats.totalMoves + 1,
         highestTile: Math.max(playerStats.highestTile, newHighestTile)
       });
+      console.log("moves: ", playerStats.totalMoves)
     }
 
     finishMove(moved, newScore);
@@ -863,6 +880,7 @@ export const GameProvider = ({ children }) => {
       newTiles,
 
       playerStats,
+
       gameSettings,
 
       initGame,
@@ -872,6 +890,7 @@ export const GameProvider = ({ children }) => {
       moveRight,
       undo,
       updateHighScore,
+
       updatePlayerStats,
       updateGameSettings
     }}>
@@ -879,4 +898,3 @@ export const GameProvider = ({ children }) => {
     </GameContext.Provider>
   );
 };
-

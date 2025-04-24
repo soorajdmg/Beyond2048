@@ -408,7 +408,7 @@ exports.getLeaderboard = async (req, res) => {
     const leaderboard = await User.find({})
       .sort({ bestScore: -1 })
       .limit(10)
-      .select('username bestScore gamesPlayed');
+      .select('username bestScore gamesPlayed totalWins highestTile');
 
     if (!leaderboard) {
       return res.status(404).json({
@@ -421,7 +421,9 @@ exports.getLeaderboard = async (req, res) => {
       rank: index + 1,
       username: user.username,
       highScore: user.bestScore || 0,
-      gamesPlayed: user.gamesPlayed || 0
+      gamesPlayed: user.gamesPlayed || 0,
+      totalWins: user.totalWins || 0,
+      highestTile: user.highestTile || 0
     }));
 
     res.status(200).json({
@@ -433,6 +435,81 @@ exports.getLeaderboard = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error while fetching leaderboard data',
+      error: error.message
+    });
+  }
+};
+
+exports.getMostWinsLeaderboard = async (req, res) => {
+  try {
+    const leaderboard = await User.find({ totalWins: { $gt: 0 } })
+      .sort({ totalWins: -1 })
+      .limit(10)
+      .select('username totalWins gamesPlayed bestScore highestTile');
+
+    if (!leaderboard || leaderboard.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No users found with wins for leaderboard'
+      });
+    }
+
+    const formattedLeaderboard = leaderboard.map((user, index) => ({
+      rank: index + 1,
+      username: user.username,
+      totalWins: user.totalWins || 0,
+      gamesPlayed: user.gamesPlayed || 0,
+      winRate: user.gamesPlayed > 0 ? ((user.totalWins / user.gamesPlayed) * 100).toFixed(1) : "0.0",
+      bestScore: user.bestScore || 0,
+      highestTile: user.highestTile || 0
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedLeaderboard
+    });
+  } catch (error) {
+    console.error('Get most wins leaderboard error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching most wins leaderboard data',
+      error: error.message
+    });
+  }
+};
+
+exports.getHighestTilesLeaderboard = async (req, res) => {
+  try {
+    const leaderboard = await User.find({ highestTile: { $gt: 0 } })
+      .sort({ highestTile: -1 })
+      .limit(10)
+      .select('username highestTile bestScore gamesPlayed totalWins');
+
+    if (!leaderboard || leaderboard.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No users found with tiles for leaderboard'
+      });
+    }
+
+    const formattedLeaderboard = leaderboard.map((user, index) => ({
+      rank: index + 1,
+      username: user.username,
+      highestTile: user.highestTile || 0,
+      bestScore: user.bestScore || 0,
+      gamesPlayed: user.gamesPlayed || 0,
+      totalWins: user.totalWins || 0
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedLeaderboard
+    });
+  } catch (error) {
+    console.error('Get highest tiles leaderboard error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching highest tiles leaderboard data',
       error: error.message
     });
   }
