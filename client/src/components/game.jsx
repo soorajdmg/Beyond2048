@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/authContext';
 import GameTile from './GameTile';
 import GameOverlay from './GameOverlay';
 import { Undo, RotateCcw } from 'lucide-react';
-import './Game.css';
+import './game.css';
 
 const Game = () => {
   const {
