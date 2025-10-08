@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: beyond2048
+    runtime: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
+    envVars:
+      - key: NODE_VERSION
+        value: 18
