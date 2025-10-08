@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useGameContext } from '../contexts/gameContext';
 import { useAuth } from '../contexts/authContext';
-import GameTile from './GameTile';
-import GameOverlay from './GameOverlay';
+import GameTile from './gameTile';
+import GameOverlay from './gameOverlay';
 import { Undo, RotateCcw } from 'lucide-react';
 import './game.css';
 
