@@ -8,9 +8,12 @@ const statsRoutes = require('./routes/stats');
 
 const app = express();
 
+const allowedOrigins = process.env.CLIENT_URL
+  ? [process.env.CLIENT_URL, 'http://localhost:5173']
+  : ['http://localhost:5173'];
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Your React app's URL
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -59,10 +62,15 @@ mongoose.connect(process.env.MONGO_URI, {
 }).then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
 app.use((req, res) => {
   console.log(`Route not found: ${req.method} ${req.url}`);
   res.status(404).send("Route not found");
 });
+
+// Only start the server when not running in Vercel (serverless)
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;

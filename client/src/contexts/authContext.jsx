@@ -2,12 +2,14 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 // Set default base URL
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = API_URL;
 
 // Create a separate axios instance for auth to avoid header conflicts
 const authAxios = axios.create({
-  baseURL: 'http://localhost:5000',
+  baseURL: API_URL,
 });
 const AuthContext = createContext();
 
